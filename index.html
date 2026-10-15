@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasas TAI y TDA · Tecnológico Comfenalco</title>
+<meta name="description" content="Tasa de Ausencia Intersemestral (TAI) y Tasa de Deserción Anual (TDA) por programa. Fundación Universitaria Tecnológico Comfenalco, Cartagena.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:root{
+  /* Colores institucionales (azul y rojo) */
+  --azul-900:#0A2B5E;
+  --azul-800:#123A75;
+  --azul:#1F5FB0;          /* Serie TAI */
+  --azul-50:#EAF1FA;
+  --rojo:#D0283A;          /* Serie TDA y acento institucional */
+  --rojo-50:#FBECEE;
+  /* Superficies y texto */
+  --fondo:#F3F5F9;
+  --tarjeta:#FFFFFF;
+  --borde:#DDE3EC;
+  --rejilla:#E8ECF2;
+  --tinta:#15203A;
+  --tinta-2:#45526B;
+  --tenue:#6A758B;
+  --punto:#24324F;
+  --ref:#8A94A6;
+  --radio:12px;
+  --sombra:0 1px 2px rgba(10,43,94,.06),0 4px 14px rgba(10,43,94,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--fondo);color:var(--tinta);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+.contenedor{max-width:1360px;margin:0 auto;padding:0 20px}
+
+/* ---------- Encabezado ---------- */
+header.cabecera{background:var(--azul-900);color:#fff;border-bottom:4px solid var(--rojo)}
+.cabecera .contenedor{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;padding-top:18px;padding-bottom:18px}
+.marca{display:flex;align-items:center;gap:14px;min-width:0}
+.sello{width:44px;height:44px;border-radius:10px;background:#fff;display:grid;place-items:center;flex:none}
+.sello span{font-weight:700;font-size:15px;color:var(--azul-900);letter-spacing:-.02em}
+.sello span b{color:var(--rojo)}
+.marca h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.marca p{margin:2px 0 0;font-size:13px;color:#C9D5EA}
+.controles-sync{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.estado{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#DCE5F3;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:6px 10px;border-radius:999px;white-space:nowrap}
+.estado i{width:8px;height:8px;border-radius:50%;background:#7FD1A1;flex:none}
+.estado.respaldo i{background:#F2C14E}
+.estado.error i{background:#FF8A8A}
+.auto{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#DCE5F3}
+.auto select{background:#fff;color:var(--tinta);border:0;border-radius:8px;padding:7px 28px 7px 10px;font-size:13px;cursor:pointer}
+.cuenta{font-size:12px;color:#AFC0DC;min-width:88px;font-variant-numeric:tabular-nums}
+.btn-actualizar{display:inline-flex;align-items:center;gap:8px;background:var(--rojo);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:600;font-size:14px;cursor:pointer;transition:filter .15s}
+.btn-actualizar:hover{filter:brightness(1.08)}
+.btn-actualizar:focus-visible,.auto select:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.btn-actualizar svg{width:16px;height:16px}
+.girando svg{animation:girar 1s linear infinite}
+@keyframes girar{to{transform:rotate(360deg)}}
+
+/* ---------- Filtros ---------- */
+.barra-filtros{position:sticky;top:0;z-index:20;background:rgba(243,245,249,.94);backdrop-filter:saturate(1.4) blur(6px);border-bottom:1px solid var(--borde)}
+.filtros{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 14px;padding-top:12px;padding-bottom:12px}
+.campo{display:flex;flex-direction:column;gap:4px;min-width:0}
+.campo label,.campo .rotulo{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tenue)}
+.campo select{appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2345526B' stroke-width='1.6' fill='none'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid var(--borde);border-radius:8px;padding:7px 30px 7px 10px;font-size:14px;cursor:pointer;max-width:100%}
+.campo select:focus-visible,.segmento button:focus-visible,.btn:focus-visible{outline:2px solid var(--azul);outline-offset:1px}
+.f-programa select{width:300px}
+.f-facultad select{width:250px}
+.grupo-periodo{display:flex;gap:6px}
+.segmento{display:inline-flex;background:#fff;border:1px solid var(--borde);border-radius:8px;padding:2px}
+.segmento button{border:0;background:transparent;padding:5px 11px;border-radius:6px;font-size:14px;cursor:pointer;color:var(--tinta-2)}
+.segmento button[aria-pressed="true"]{background:var(--azul-900);color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid var(--borde);border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer;color:var(--tinta-2)}
+.btn:hover{border-color:#B9C3D3;color:var(--tinta)}
+.btn-play{width:36px;padding:7px 0}
+.btn-play svg{width:14px;height:14px}
+.limpiar{margin-left:auto}
+
+/* ---------- Contenido ---------- */
+main{padding-top:18px;padding-bottom:36px;transition:opacity .25s}
+main.cargando{opacity:.55;pointer-events:none}
+.aviso{display:none;margin-bottom:14px;padding:10px 14px;border-radius:10px;font-size:14px;background:#FFF7E0;border:1px solid #F0D98A;color:#5A4500}
+.aviso.visible{display:block}
+.contexto{font-size:14px;color:var(--tinta-2);margin:0 0 14px}
+.contexto b{color:var(--tinta);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:start}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c12{grid-column:span 12}
+.tarjeta{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);box-shadow:var(--sombra);padding:16px 18px;min-width:0}
+.tarjeta h2{margin:0;font-size:16px;font-weight:600;letter-spacing:-.005em}
+.tarjeta .sub{margin:3px 0 0;font-size:13px;color:var(--tenue)}
+.cab-tarjeta{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px 16px;margin-bottom:8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--tinta-2)}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.key-linea{width:18px;height:0;border-top:2px solid}
+.key-linea.punteada{border-top-style:dashed}
+.key-forma{width:10px;height:10px;background:var(--punto)}
+.key-forma.circulo{border-radius:50%}
+.key-forma.rombo{transform:rotate(45deg) scale(.85)}
+.key-rect{width:12px;height:10px;border-radius:2px}
+
+/* KPIs */
+.kpi{display:flex;flex-direction:column;gap:6px;min-height:168px}
+.kpi .titulo{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--tinta-2)}
+.kpi .marca-serie{width:10px;height:10px;flex:none}
+.kpi .marca-serie.tai{background:var(--azul);border-radius:50%}
+.kpi .marca-serie.tda{background:var(--rojo);transform:rotate(45deg) scale(.85)}
+.kpi .valor{font-size:40px;font-weight:600;letter-spacing:-.02em;line-height:1.05}
+.kpi .valor small{font-size:18px;font-weight:500;color:var(--tinta-2);margin-left:2px}
+.kpi .delta{font-size:13px;color:var(--tinta-2)}
+.kpi .delta b{font-weight:600;color:var(--tinta)}
+.kpi .detalle{font-size:12.5px;color:var(--tenue);margin-top:auto}
+.kpi svg.spark{width:100%;height:34px;display:block}
+.kpi .grande{font-size:15px;font-weight:600;line-height:1.3}
+.kpi .lista-mini{margin:0;padding:0;list-style:none;font-size:13px;color:var(--tinta-2);display:flex;flex-direction:column;gap:3px}
+.kpi .lista-mini li{display:flex;justify-content:space-between;gap:10px}
+.kpi .lista-mini li span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi .lista-mini li span:last-child{font-variant-numeric:tabular-nums;color:var(--tinta);font-weight:500;white-space:nowrap}
+
+/* Cuadrantes */
+.cuadrantes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cuad{border:1px solid var(--borde);border-radius:10px;padding:10px 12px;min-height:118px;background:#fff;min-width:0}
+.cuad li{max-width:100%;min-width:0}
+.cuad.alerta{background:#F6F7FA;border-color:#C9D0DC}
+.cuad h3{margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:600}
+.cuad h3 .n{font-size:22px;font-weight:600;color:var(--tinta)}
+.cuad p.def{margin:2px 0 6px;font-size:12px;color:var(--tenue)}
+.cuad ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px}
+.cuad li button{border:1px solid var(--borde);background:#fff;border-radius:999px;padding:2px 8px;font-size:12px;cursor:pointer;color:var(--tinta-2);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cuad li button:hover{border-color:var(--azul);color:var(--azul-900)}
+.nota-pequena{font-size:12px;color:var(--tenue);margin:10px 0 0}
+
+/* Gráficos */
+.grafico{width:100%}
+#g-riesgo{height:440px}
+#g-evolucion{height:390px}
+.toggle-tasa{display:inline-flex}
+
+/* Tabla */
+.herramientas-tabla{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.buscar{border:1px solid var(--borde);border-radius:8px;padding:7px 10px;font-size:14px;width:220px;background:#fff}
+.tabla-envoltura{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rejilla);text-align:left;vertical-align:middle}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--tenue);font-weight:600;white-space:nowrap;position:sticky;top:0;background:#fff}
+th button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+th button:focus-visible{outline:2px solid var(--azul)}
+th .flecha{opacity:.35;font-size:10px}
+th[aria-sort] .flecha{opacity:1}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:#F8FAFD}
+tbody tr.fila-inst{background:var(--azul-50);font-weight:600}
+td .prog{font-weight:500}
+td .fac{font-size:12px;color:var(--tenue)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap;color:var(--tinta-2)}
+.sube{color:var(--tinta)}
+.vacio{color:#A2ABBC}
+
+footer{border-top:1px solid var(--borde);padding:18px 0 28px;font-size:12.5px;color:var(--tenue)}
+footer p{margin:4px 0}
+footer b{color:var(--tinta-2);font-weight:600}
+
+@media (max-width:1100px){
+  .c3{grid-column:span 6}
+  .c7,.c5,.c6{grid-column:span 12}
+}
+@media (max-width:640px){
+  .contenedor{padding:0 16px}
+  .c3,.c4,.c5,.c6,.c7{grid-column:span 12}
+  .marca h1{font-size:17px}
+  .f-programa select,.f-facultad select{width:100%}
+  .campo{flex:1 1 100%}
+  .campo.corto{flex:1 1 calc(50% - 7px)}
+  .limpiar{margin-left:0}
+  .barra-filtros{position:static}
+  .kpi .valor{font-size:34px}
+  #g-riesgo{height:380px}
+  .cuadrantes{grid-template-columns:1fr}
+  .buscar{width:100%}
+}
+@media print{
+  body{background:#fff}
+  header.cabecera{background:#fff;color:#000;border-bottom:2px solid #000}
+  .marca p{color:#333}
+  .controles-sync,.barra-filtros,.herramientas-tabla,.btn-play{display:none !important}
+  .tarjeta{box-shadow:none;break-inside:avoid}
+  .cuad.alerta{background:#fff;border:2px solid #000}
+}
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="contenedor">
+    <div class="marca">
+      <div class="sello" aria-hidden="true"><span>T<b>C</b></span></div>
+      <div>
+        <h1>Ausencia y deserción estudiantil · TAI + TDA</h1>
+        <p>Fundación Universitaria Tecnológico Comfenalco · Cartagena</p>
+      </div>
+    </div>
+    <div class="controles-sync">
+      <span class="estado" id="estado" role="status"><i></i><span id="estado-texto">Conectando…</span></span>
+      <label class="auto">Actualización automática
+        <select id="auto" aria-label="Intervalo de actualización automática">
+          <option value="0">Desactivada</option>
+          <option value="1">Cada 1 min</option>
+          <option value="2">Cada 2 min</option>
+          <option value="5">Cada 5 min</option>
+          <option value="10">Cada 10 min</option>
+          <option value="15">Cada 15 min</option>
+          <option value="30">Cada 30 min</option>
+          <option value="60">Cada hora</option>
+        </select>
+      </label>
+      <span class="cuenta" id="cuenta" aria-live="off"></span>
+      <button class="btn-actualizar" id="btn-actualizar" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        Actualizar
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="barra-filtros">
+  <div class="contenedor filtros" role="group" aria-label="Filtros del tablero">
+    <div class="campo corto">
+      <label for="f-periodo">Periodo</label>
+      <div class="grupo-periodo">
+        <select id="f-periodo"></select>
+        <button class="btn btn-play" id="btn-play" type="button" aria-label="Recorrer los periodos" title="Recorrer los periodos">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="campo corto">
+      <span class="rotulo" id="rot-semestre">Semestre</span>
+      <div class="segmento" id="f-semestre" role="group" aria-labelledby="rot-semestre">
+        <button type="button" data-v="Todos" aria-pressed="true">Todos</button>
+        <button type="button" data-v="I" aria-pressed="false">I</button>
+        <button type="button" data-v="II" aria-pressed="false">II</button>
+      </div>
+    </div>
+    <div class="campo f-facultad">
+      <label for="f-facultad">Facultad</label>
+      <select id="f-facultad"></select>
+    </div>
+    <div class="campo corto">
+      <label for="f-grado">Grado</label>
+      <select id="f-grado"></select>
+    </div>
+    <div class="campo f-programa">
+      <label for="f-programa">Programa</label>
+      <select id="f-programa"></select>
+    </div>
+    <button class="btn limpiar" id="btn-limpiar" type="button">Limpiar filtros</button>
+  </div>
+</div>
+
+<main class="contenedor" id="principal">
+  <div class="aviso" id="aviso" role="alert"></div>
+  <p class="contexto" id="contexto"></p>
+
+  <!-- KPIs -->
+  <section class="grid" aria-label="Indicadores principales">
+    <article class="tarjeta kpi c3" id="kpi-tai"></article>
+    <article class="tarjeta kpi c3" id="kpi-tda"></article>
+    <article class="tarjeta kpi c3" id="kpi-alerta"></article>
+    <article class="tarjeta kpi c3" id="kpi-mayores"></article>
+  </section>
+
+  <!-- Mapa de riesgo -->
+  <section class="grid" style="margin-top:16px">
+    <article class="tarjeta c7">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Mapa de riesgo: TAI frente a TDA</h2>
+          <p class="sub" id="sub-riesgo"></p>
+        </div>
+        <div class="leyenda">
+          <span><i class="key-forma circulo"></i>Profesional</span>
+          <span><i class="key-forma rombo"></i>Tecnológico</span>
+          <span><i class="key-linea" style="border-color:var(--ref)"></i>Tasa institucional</span>
+        </div>
+      </div>
+      <div id="g-riesgo" class="grafico" role="img" aria-label="Diagrama de dispersión de programas según TAI y TDA"></div>
+      <p class="nota-pequena" id="nota-riesgo"></p>
+    </article>
+    <article class="tarjeta c5">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Programas por cuadrante</h2>
+          <p class="sub">Comparados con la tasa institucional del periodo. Toca un programa para filtrarlo.</p>
+        </div>
+      </div>
+      <div class="cuadrantes" id="cuadrantes"></div>
+    </article>
+  </section>
+
+  <!-- Evolución y variación -->
+  <section class="grid" style="margin-top:16px">
+    <article class="tarjeta c6">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Evolución histórica</h2>
+          <p class="sub" id="sub-evolucion"></p>
+        </div>
+        <div class="leyenda" id="ley-evolucion"></div>
+      </div>
+      <div id="g-evolucion" class="grafico" role="img" aria-label="Evolución histórica de TAI y TDA"></div>
+    </article>
+    <article class="tarjeta c6">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Cambio frente al periodo anterior</h2>
+          <p class="sub" id="sub-variacion"></p>
+        </div>
+        <div class="leyenda">
+          <span><i class="key-rect" style="background:var(--azul)"></i>TAI</span>
+          <span><i class="key-rect" style="background:var(--rojo)"></i>TDA</span>
+        </div>
+      </div>
+      <div id="g-variacion" class="grafico" role="img" aria-label="Cambio de TAI y TDA por programa en puntos porcentuales"></div>
+    </article>
+  </section>
+
+  <!-- Mapa de calor -->
+  <section class="grid" style="margin-top:16px">
+    <article class="tarjeta c12">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Mapa de calor por programa y periodo</h2>
+          <p class="sub">Cada celda es la tasa del programa en ese periodo. Más oscuro = tasa más alta.</p>
+        </div>
+        <div class="segmento toggle-tasa" id="toggle-calor" role="group" aria-label="Tasa del mapa de calor">
+          <button type="button" data-v="tai" aria-pressed="true">TAI</button>
+          <button type="button" data-v="tda" aria-pressed="false">TDA</button>
+        </div>
+      </div>
+      <div id="g-calor" class="grafico" role="img" aria-label="Mapa de calor de tasas por programa y periodo"></div>
+    </article>
+  </section>
+
+  <!-- Tabla -->
+  <section class="grid" style="margin-top:16px">
+    <article class="tarjeta c12">
+      <div class="cab-tarjeta">
+        <div>
+          <h2>Detalle por programa</h2>
+          <p class="sub" id="sub-tabla"></p>
+        </div>
+        <div class="herramientas-tabla">
+          <input class="buscar" id="buscar" type="search" placeholder="Buscar programa…" aria-label="Buscar programa">
+          <button class="btn" id="btn-csv" type="button">Descargar CSV</button>
+        </div>
+      </div>
+      <div class="tabla-envoltura">
+        <table id="tabla">
+          <thead><tr id="thead-fila"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <div class="contenedor">
+    <p><b>TAI (Tasa de Ausencia Intersemestral):</b> estudiantes que no renovaron matrícula en el periodo, sobre los matriculados del periodo anterior. Es una tasa interna: omite a los egresados no graduados.</p>
+    <p><b>TDA (Tasa de Deserción Anual):</b> desertores (no matriculados en los dos periodos siguientes), sobre los matriculados del periodo base.</p>
+    <p><b>Agrupaciones:</b> sin filtros se muestra la tasa institucional oficial. Con filtros, el último periodo se calcula ponderado por matriculados; los periodos anteriores, como promedio simple de los programas filtrados.</p>
+    <p id="pie-fuentes"></p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   Configuración
+   ========================================================= */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzpmKtRK4oqeoHxbdrvAFwdLpoHKPIaf2Bg04DewUP56AKP9Ln3Y1MQdVB4fp04c7cX/exec';
+const API_TOKEN = '';           // si configuras CONFIG.TOKEN en Apps Script, escríbelo aquí
+const TIEMPO_ESPERA_MS = 90000;
+
+/* Copia de respaldo (datos agregados) por si no hay conexión */
+const RESPALDO = {"ok":true,"generado":"2026-10-15T18:31:47.521Z","fuentes":{"tai":{"nombre":"TAI 2026-1.xlsx","modificado":"2026-09-16T21:20:54.600Z"},"tda":{"nombre":"TDA 2026-1.xlsx","modificado":"2026-09-17T14:01:33.363Z"}},"tai":{"historico":{"hoja":"Tasas consolidadas","periodos":["2016-I","2016-II","2017-I","2017-II","2018-I","2018-II","2019-I","2019-II","2020-I","2020-II","2021-I","2021-II","2022-I","2022-II","2023-I","2023-II","2024-I","2024-II","2025-I","2025-II","2026-I"],"ultimoPeriodo":"2026-I","programas":[{"programa":"ADMINISTRACIÓN DE EMPRESAS","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[0.221,0.139,0.117,0.097,0.117,0.302,0.315,0.1,0.098,0.118,0.147,0.072,0.077,0.07,0.055,0.063,0.061,0.046,0.042,0.04326123128119801,0.03709949409780776]},{"programa":"ADMINISTRACIÓN EN SEGURIDAD Y SALUD EN EL TRABAJO","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,0.222,0.13,0.094,0.026,0.088,0.048,0.093,0.026,0.05405405405405406,0.057692307692307696]},{"programa":"CONTADURÍA PÚBLICA","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[0.217,0.177,0.266,0.154,0.137,0.17,0.19,0.154,0.113,0.144,0.199,0.076,0.098,0.15,0.089,0.125,0.052,0.07,0.064,0.072,0.046875]},{"programa":"DERECHO","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[0.147,0.179,0.159,0.231,0.111,0.158,0.129,0.104,0.078,0.081,0.098,0.074,0.078,0.072,0.058,0.117,0.1,0.08,0.079,0.09547738693467336,0.07291666666666667]},{"programa":"INGENIERÍA AMBIENTAL","grado":"Profesional","facultad":"Ingeniería","serie":[0.118,0.088,0.07,0.016,0.119,0.1,0.083,0.265,0.115,0.113,0.131,0.084,0.132,0.048,0.167,0.133,0.089,0.15,0.144,0.15053763440860216,0.09375]},{"programa":"INGENIERÍA CIVIL","grado":"Profesional","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,0.174,0.227,0.08,0.108,0.114,0.105,0.101,0.097,0.083,0.07948717948717948,0.06233062330623306]},{"programa":"INGENIERÍA DE PROCESOS","grado":"Profesional","facultad":"Ingeniería","serie":[0.295,0.331,0.245,0.251,0.219,0.207,0.142,0.283,0.292,0.253,0.356,0.079,0.135,0.188,0.107,0.126,0.131,0.128,0.067,0.125,0.08571428571428572]},{"programa":"INGENIERÍA DE SISTEMAS","grado":"Profesional","facultad":"Ingeniería","serie":[0.366,0.296,0.169,0.209,0.183,0.097,0.177,0.169,0.052,0.052,0.298,0.098,0.063,0.099,0.006,0.065,0.132,0.133,0.078,0.05714285714285714,0.054838709677419356]},{"programa":"INGENIERÍA ELECTRÓNICA","grado":"Profesional","facultad":"Ingeniería","serie":[0,0.058,0.014,0.253,0.066,0.16,0.026,0.224,0.169,0.206,0.316,0.065,0.058,0.125,0.063,0.072,0.061,0.045,0.066,0.03636363636363636,0.08695652173913043]},{"programa":"INGENIERÍA INDUSTRIAL","grado":"Profesional","facultad":"Ingeniería","serie":[0.213,0.179,0.141,0.147,0.152,0.172,0.146,0.27,0.14,0.161,0.286,0.072,0.084,0.076,0.097,0.096,0.104,0.078,0.08,0.07130730050933787,0.06560283687943262]},{"programa":"LICENCIATURA EN EDUCACION INFANTIL","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.17391304347826086,0.09836065573770492]},{"programa":"NEGOCIOS INTERNACIONALES PROFESIONAL","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0.02197802197802198]},{"programa":"PSICOLOGÍA","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[0.15,0.118,0.115,0.159,0.109,0.092,0.11,0.094,0.13,0.172,0.075,0.06,0.051,0.153,0.042,0.049,0.045,0.033,0.035,0.05053191489361702,0.06534090909090909]},{"programa":"TECNOLOGÍA EN CONSTRUCCIONES CIVILES","grado":"Tecnológico","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.14285714285714285,0.1927710843373494]},{"programa":"TECNOLOGÍA EN CONTROL DE CALIDAD","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.153,0.174,0.164,0.184,0.125,0.171,0.157,0.204,0.217,0.246,0.106,0.11,0.073,0.128,0.099,0.104,0.119,0.105,0.111,0.08571428571428572,0.11904761904761904]},{"programa":"TECNOLOGÍA EN CONTROL ELECTRÓNICO DE PROCESOS","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.31,0.175,0.197,0.165,0.149,0.171,0.284,0.179,0.213,0.312,0.118,0.131,0.101,0.089,0.098,0.115,0.146,0.147,0.099,0.1276595744680851,0.16551724137931034]},{"programa":"TECNOLOGÍA EN DESARROLLO DE SOFTWARE","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.209,0.275,0.216,0.213,0.195,0.293,0.142,0.22,0.196,0.275,0.113,0.158,0.092,0.102,0.106,0.106,0.09,0.098,0.088,0.1037037037037037,0.08781362007168458]},{"programa":"TECNOLOGÍA EN GESTIÓN AMBIENTAL INDUSTRIAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.219,0.222,0.19,0.211,0.17,0.22,0.052,0.191,0.171,0.204,0.09,0.128,0.067,0.066,0.092,0.097,0.101,0.087,0.088,0.05747126436781609,0.06289308176100629]},{"programa":"TECNOLOGÍA EN GESTIÓN CONTABLE","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.224,0.151,0.127,0.107,0.09913793103448276,0.09615384615384616]},{"programa":"TECNOLOGÍA EN GESTIÓN DE MARKETING","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,0.17,0.115,0.101,0.147,0.111,0.112,0.076,0.10752688172043011,0.06545454545454546]},{"programa":"TECNOLOGÍA EN GESTIÓN DE NEGOCIOS INTERNACIONALES","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.201,0.237,0.235,0.228,0.207,0.243,0.235,0.188,0.186,0.275,0.151,0.119,0.124,0.115,0.093,0.106,0.106,0.082,0.084,0.0818452380952381,0.08321579689703808]},{"programa":"TECNOLOGIA EN GESTION REDES DE COMPUTADORES Y SEGURIDAD INFORMATICA","grado":"Tecnológico","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.12,0.116,0.097,0.176,0.0891089108910891,0.09565217391304348]},{"programa":"TECNOLOGÍA EN GESTIÓN DEL TALENTO HUMANO","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.1111111111111111]},{"programa":"TECNOLOGÍA EN GESTIÓN FINANCIERA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.232,0.283,0.283,0.269,0.142,0.231,0.21,0.193,0.084,0.187,0.126,0.131,0.077,0.126,0.09,0.098,0.125,0.077,0.132,0.11016949152542373,0.09615384615384616]},{"programa":"TECNOLOGÍA EN GESTIÓN LOGÍSTICA Y PORTUARIA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.155,0.231,0.195,0.247,0.147,0.217,0.238,0.211,0.148,0.188,0.144,0.124,0.077,0.101,0.094,0.091,0.102,0.106,0.104,0.12632821723730814,0.09202453987730061]},{"programa":"TECNOLOGÍA EN GESTIÓN TURÍSTICA Y HOTELERA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.186,0.182,0.217,0.255,0.198,0.293,0.149,0.2,0.091,0.156,0.182,0.078,0.077,0.119,0.077,0.091,0.123,0.094,0.138,0.09831460674157304,0.07163323782234957]},{"programa":"TECNOLOGÍA EN INSTRUMENTACIÓN INDUSTRIAL.","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.561,0.244,0.163,0.24,0.174,0.22,0.164,0.22,0.063,0.541,0.12,0.157,0.146,0.25,0.09,0.222,0.116,0.065,0.074,0,0]},{"programa":"TECNOLOGÍA EN OPERACIÓN DE PLANTAS Y PROCESOS INDUSTRIALES","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.27,0.268,0.203,0.301,0.201,0.233,0.134,0.223,0.249,0.308,0.123,0.146,0.119,0.132,0.102,0.139,0.137,0.12,0.156,0.18,0.17535545023696683]},{"programa":"TECNOLOGIA EN PRODUCCIÓN INDUSTRIAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.199,0.216,0.216,0.189,0.187,0.198,0.128,0.18,0.189,0.247,0.105,0.14,0.097,0.097,0.1,0.1,0.105,0.097,0.088,0.09072164948453608,0.09195402298850575]},{"programa":"TECNOLOGÍA EN PROMOCIÓN SOCIAL","grado":"Tecnológico","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.03225806451612903,0.0196078431372549]},{"programa":"TECNOLOGÍA EN SEGURIDAD E HIGIENE OCUPACIONAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.247,0.256,0.175,0.22,0.107,0.258,0.167,0.175,0.197,0.339,0.138,0.125,0.133,0.108,0.102,0.09,0.136,0.076,0.09,0.10599078341013825,0.10513447432762836]},{"programa":"TRABAJO SOCIAL","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,0.143,0.16,0.206,0.059,0.121,0.051,0.06,0.058,0.047,0.045,0.036,0.048,0.03529411764705882,0.04773869346733668]}],"institucional":{"programa":"INSTITUCIONAL","grado":"-----","facultad":"-----","serie":[0.229,0.205,0.183,0.211,0.153,0.193,0.149,0.179,0.143,0.203,0.159,0.117,0.09,0.106,0.087,0.1,0.099,0.087,0.085,0.08940499434796012,0.08053050397877984]}},"resumen":{"hoja":"TAI 2025-2","periodo":"2026-1","columnas":[{"clave":"matriculados","etiqueta":"Est. matriculados 2025-2"},{"clave":"continuan","etiqueta":"Est. que continuan matrícula en 2026-1"},{"clave":"ausentes","etiqueta":"Ausentes 2026-1"},{"clave":"fima","etiqueta":"Est. que terminaron académicamente 2025-2"},{"clave":"graduados","etiqueta":"Graduados"},{"clave":"noRenovaron","etiqueta":"Est. que no renovaron matricula 2026-1"},{"clave":"causaNoDeterminada","etiqueta":"Causa de ausencia no determinada"},{"clave":"otraCondicion","etiqueta":"Otra condición"},{"clave":"tasa","etiqueta":"TAI 2026-1"}],"filas":[{"programa":"ADMINISTRACIÓN DE EMPRESAS","matriculados":593,"continuan":384,"ausentes":209,"fima":8,"graduados":179,"noRenovaron":22,"causaNoDeterminada":21,"otraCondicion":1,"tasa":0.03709949409780776},{"programa":"ADMINISTRACIÓN EN SEGURIDAD Y SALUD EN EL TRABAJO","matriculados":52,"continuan":36,"ausentes":16,"fima":1,"graduados":12,"noRenovaron":3,"causaNoDeterminada":3,"otraCondicion":null,"tasa":0.057692307692307696},{"programa":"CONTADURÍA PÚBLICA","matriculados":256,"continuan":191,"ausentes":65,"fima":8,"graduados":45,"noRenovaron":12,"causaNoDeterminada":6,"otraCondicion":6,"tasa":0.046875},{"programa":"DERECHO","matriculados":384,"continuan":325,"ausentes":59,"fima":31,"graduados":null,"noRenovaron":28,"causaNoDeterminada":18,"otraCondicion":10,"tasa":0.07291666666666667},{"programa":"INGENIERÍA AMBIENTAL","matriculados":96,"continuan":71,"ausentes":25,"fima":2,"graduados":14,"noRenovaron":9,"causaNoDeterminada":null,"otraCondicion":9,"tasa":0.09375},{"programa":"INGENIERÍA CIVIL","matriculados":369,"continuan":340,"ausentes":29,"fima":4,"graduados":2,"noRenovaron":23,"causaNoDeterminada":null,"otraCondicion":23,"tasa":0.06233062330623306},{"programa":"INGENIERÍA DE PROCESOS","matriculados":70,"continuan":42,"ausentes":28,"fima":9,"graduados":13,"noRenovaron":6,"causaNoDeterminada":6,"otraCondicion":null,"tasa":0.08571428571428572},{"programa":"INGENIERÍA DE SISTEMAS","matriculados":310,"continuan":239,"ausentes":71,"fima":1,"graduados":53,"noRenovaron":17,"causaNoDeterminada":4,"otraCondicion":13,"tasa":0.054838709677419356},{"programa":"INGENIERÍA ELECTRÓNICA","matriculados":92,"continuan":58,"ausentes":34,"fima":7,"graduados":19,"noRenovaron":8,"causaNoDeterminada":5,"otraCondicion":3,"tasa":0.08695652173913043},{"programa":"INGENIERÍA INDUSTRIAL","matriculados":564,"continuan":392,"ausentes":172,"fima":55,"graduados":80,"noRenovaron":37,"causaNoDeterminada":36,"otraCondicion":1,"tasa":0.06560283687943262},{"programa":"LICENCIATURA EN EDUCACION INFANTIL","matriculados":61,"continuan":55,"ausentes":6,"fima":null,"graduados":null,"noRenovaron":6,"causaNoDeterminada":2,"otraCondicion":4,"tasa":0.09836065573770492},{"programa":"NEGOCIOS INTERNACIONALES PROFESIONAL","matriculados":91,"continuan":86,"ausentes":5,"fima":null,"graduados":3,"noRenovaron":2,"causaNoDeterminada":2,"otraCondicion":null,"tasa":0.02197802197802198},{"programa":"PSICOLOGÍA","matriculados":352,"continuan":286,"ausentes":66,"fima":8,"graduados":35,"noRenovaron":23,"causaNoDeterminada":15,"otraCondicion":8,"tasa":0.06534090909090909},{"programa":"TECNOLOGÍA EN CONSTRUCCIONES CIVILES","matriculados":83,"continuan":67,"ausentes":16,"fima":null,"graduados":null,"noRenovaron":16,"causaNoDeterminada":null,"otraCondicion":16,"tasa":0.1927710843373494},{"programa":"TECNOLOGÍA EN CONTROL DE CALIDAD","matriculados":168,"continuan":142,"ausentes":26,"fima":3,"graduados":3,"noRenovaron":20,"causaNoDeterminada":13,"otraCondicion":7,"tasa":0.11904761904761904},{"programa":"TECNOLOGÍA EN CONTROL ELECTRÓNICO DE PROCESOS","matriculados":145,"continuan":118,"ausentes":27,"fima":1,"graduados":2,"noRenovaron":24,"causaNoDeterminada":14,"otraCondicion":10,"tasa":0.16551724137931034},{"programa":"TECNOLOGÍA EN DESARROLLO DE SOFTWARE","matriculados":1116,"continuan":974,"ausentes":142,"fima":15,"graduados":29,"noRenovaron":98,"causaNoDeterminada":97,"otraCondicion":1,"tasa":0.08781362007168458},{"programa":"TECNOLOGÍA EN GESTIÓN AMBIENTAL INDUSTRIAL","matriculados":159,"continuan":144,"ausentes":15,"fima":2,"graduados":3,"noRenovaron":10,"causaNoDeterminada":null,"otraCondicion":10,"tasa":0.06289308176100629},{"programa":"TECNOLOGÍA EN GESTIÓN CONTABLE","matriculados":468,"continuan":408,"ausentes":60,"fima":8,"graduados":7,"noRenovaron":45,"causaNoDeterminada":44,"otraCondicion":1,"tasa":0.09615384615384616},{"programa":"TECNOLOGÍA EN GESTIÓN DE MARKETING","matriculados":275,"continuan":239,"ausentes":36,"fima":18,"graduados":null,"noRenovaron":18,"causaNoDeterminada":18,"otraCondicion":null,"tasa":0.06545454545454546},{"programa":"TECNOLOGÍA EN GESTIÓN DE NEGOCIOS INTERNACIONALES","matriculados":709,"continuan":588,"ausentes":121,"fima":22,"graduados":40,"noRenovaron":59,"causaNoDeterminada":59,"otraCondicion":null,"tasa":0.08321579689703808},{"programa":"TECNOLOGIA EN GESTION REDES DE COMPUTADORES Y SEGURIDAD INFORMATICA","matriculados":115,"continuan":100,"ausentes":15,"fima":2,"graduados":2,"noRenovaron":11,"causaNoDeterminada":6,"otraCondicion":5,"tasa":0.09565217391304348},{"programa":"TECNOLOGÍA EN GESTIÓN DEL TALENTO HUMANO","matriculados":18,"continuan":15,"ausentes":3,"fima":null,"graduados":1,"noRenovaron":2,"causaNoDeterminada":2,"otraCondicion":null,"tasa":0.1111111111111111},{"programa":"TECNOLOGÍA EN GESTIÓN FINANCIERA","matriculados":208,"continuan":163,"ausentes":45,"fima":8,"graduados":17,"noRenovaron":20,"causaNoDeterminada":17,"otraCondicion":3,"tasa":0.09615384615384616},{"programa":"TECNOLOGÍA EN GESTIÓN LOGÍSTICA Y PORTUARIA","matriculados":815,"continuan":642,"ausentes":173,"fima":16,"graduados":82,"noRenovaron":75,"causaNoDeterminada":63,"otraCondicion":12,"tasa":0.09202453987730061},{"programa":"TECNOLOGÍA EN GESTIÓN TURÍSTICA Y HOTELERA","matriculados":349,"continuan":274,"ausentes":75,"fima":26,"graduados":24,"noRenovaron":25,"causaNoDeterminada":25,"otraCondicion":null,"tasa":0.07163323782234957},{"programa":"TECNOLOGÍA EN INSTRUMENTACIÓN INDUSTRIAL.","matriculados":3,"continuan":2,"ausentes":1,"fima":null,"graduados":1,"noRenovaron":0,"causaNoDeterminada":null,"otraCondicion":null,"tasa":0},{"programa":"TECNOLOGÍA EN OPERACIÓN DE PLANTAS Y PROCESOS INDUSTRIALES","matriculados":211,"continuan":162,"ausentes":49,"fima":4,"graduados":8,"noRenovaron":37,"causaNoDeterminada":37,"otraCondicion":null,"tasa":0.17535545023696683},{"programa":"TECNOLOGIA EN PRODUCCIÓN INDUSTRIAL","matriculados":435,"continuan":374,"ausentes":61,"fima":13,"graduados":8,"noRenovaron":40,"causaNoDeterminada":38,"otraCondicion":2,"tasa":0.09195402298850575},{"programa":"TECNOLOGÍA EN PROMOCIÓN SOCIAL","matriculados":51,"continuan":50,"ausentes":1,"fima":null,"graduados":null,"noRenovaron":1,"causaNoDeterminada":1,"otraCondicion":null,"tasa":0.0196078431372549},{"programa":"TECNOLOGÍA EN SEGURIDAD E HIGIENE OCUPACIONAL","matriculados":409,"continuan":326,"ausentes":83,"fima":10,"graduados":30,"noRenovaron":43,"causaNoDeterminada":29,"otraCondicion":14,"tasa":0.10513447432762836},{"programa":"TRABAJO SOCIAL","matriculados":398,"continuan":359,"ausentes":39,"fima":6,"graduados":14,"noRenovaron":19,"causaNoDeterminada":17,"otraCondicion":2,"tasa":0.04773869346733668}],"total":{"programa":"Total Institución","matriculados":9425,"continuan":7652,"ausentes":1773,"fima":288,"graduados":726,"noRenovaron":759,"causaNoDeterminada":598,"otraCondicion":161,"tasa":0.08053050397877984}}},"tda":{"historico":{"hoja":"Consolidados","periodos":["2016-I","2016-II","2017-I","2017-II","2018-I","2018-II","2019-I","2019-II","2020-I","2020-II","2021-I","2021-II","2022-I","2022-II","2023-I","2023-II","2024-I","2024-II","2025-I","2025-II","2026-I"],"ultimoPeriodo":"2026-I","programas":[{"programa":"ADMINISTRACIÓN DE EMPRESAS","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[0.131,0.1787,0.122,0.1562,0.1216,0.2944,0.0683,0.2972,0.0853,0.1126,0.092,0.0826,0.078,0.062,0.045,0.035,0.037,0.058,0.037,0.03367003367003367,0.03826955074875208]},{"programa":"ADMINISTRACIÓN EN SEGURIDAD Y SALUD EN EL TRABAJO","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,0.222,0.087,0.031,0.026,0.053,0.016,0.08,0.02631578947368421,0.04054054054054054]},{"programa":"CONTADURÍA PÚBLICA","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[0.2321,0.2107,0.2063,0.2793,0.1317,0.0727,0.1397,0.1752,0.1299,0.1389,0.1206,0.0798,0.088,0.085,0.044,0.06,0.038,0.051,0.058,0.04700854700854701,0.052]},{"programa":"DERECHO","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[0.1499,0.1245,0.155,0.1842,0.1379,0.0622,0.1345,0.1022,0.0778,0.0769,0.0796,0.0624,0.046,0.176,0.106,0.029,0.07,0.051,0.061,0.046798029556650245,0.04271356783919598]},{"programa":"INGENIERÍA AMBIENTAL","grado":"Profesional","facultad":"Ingeniería","serie":[0.1765,0.1176,0.0517,0.1529,0.0235,0.0506,0.1,0.0588,0.2821,0.1,0.0833,0.084,0.085,0.058,0.014,0.063,0.074,0.065,0.056,0.061855670103092786,0.053763440860215055]},{"programa":"INGENIERÍA CIVIL","grado":"Profesional","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,0.4348,0.0909,0.163,0.08,0.079,0.086,0.085,0.083,0.084,0.06313131313131314,0.04871794871794872]},{"programa":"INGENIERÍA DE PROCESOS","grado":"Profesional","facultad":"Ingeniería","serie":[0.2038,0.2436,0.2292,0.1862,0.1813,0.114,0.1655,0.0942,0.5231,0.2133,0.2329,0.2584,0.191,0.229,0.207,0.099,0.101,0.13,0.073,0.0449438202247191,0.075]},{"programa":"INGENIERÍA DE SISTEMAS","grado":"Profesional","facultad":"Ingeniería","serie":[0.1824,0.3168,0.1232,0.2143,0.0948,0.0465,0.0777,0.1949,0.1875,0.0521,0.0426,0.2114,0.13,0.15,0.094,0.131,0.041,0.042,0.079,0.04854368932038835,0.039285714285714285]},{"programa":"INGENIERÍA ELECTRÓNICA","grado":"Profesional","facultad":"Ingeniería","serie":[0,0,0.03846,0.0143,0.0732,0.0385,0.1333,0.0603,0.1774,0.1765,0.1327,0.0488,0.049,0.087,0.076,0.037,0.036,0.043,0.018,0.02857142857142857,0.03636363636363636]},{"programa":"INGENIERÍA INDUSTRIAL","grado":"Profesional","facultad":"Ingeniería","serie":[0.1491,0.1801,0.142,0.1689,0.1068,0.0848,0.1237,0.1112,0.3166,0.1352,0.1095,0.2015,0.085,0.077,0.069,0.078,0.069,0.076,0.055,0.057692307692307696,0.03904923599320883]},{"programa":"LICENCIATURA EN EDUCACION INFANTIL","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.17391304347826086]},{"programa":"NEGOCIOS INTERNACIONALES PROFESIONAL","grado":"Profesional","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0]},{"programa":"PSICOLOGÍA","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[0.1214,0.1211,0.0874,0.0894,0.0949,0.0567,0.092,0.0732,0.1149,0.1543,0.0824,0.0344,0.037,0.038,0.028,0.037,0.025,0.034,0.013,0.029748283752860413,0.02925531914893617]},{"programa":"TECNOLOGÍA EN CONSTRUCCIONES CIVILES","grado":"Tecnológico","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.03896103896103896,0.14285714285714285]},{"programa":"TECNOLOGÍA EN CONTROL DE CALIDAD","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.1838,0.1272,0.1596,0.1744,0.1445,0.1289,0.1388,0.1348,0.2293,0.2319,0.1742,0.0822,0.076,0.073,0.105,0.085,0.042,0.111,0.093,0.09202453987730061,0.05714285714285714]},{"programa":"TECNOLOGÍA EN CONTROL ELECTRÓNICO DE PROCESOS","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.1659,0.1789,0.1351,0.2346,0.168,0.0963,0.1561,0.0966,0.25,0.2903,0.1569,0.0803,0.089,0.092,0.073,0.068,0.094,0.131,0.112,0.07801418439716312,0.10638297872340426]},{"programa":"TECNOLOGÍA EN DESARROLLO DE SOFTWARE","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.2319,0.1953,0.2264,0.2392,0.1255,0.1689,0.2169,0.0841,0.2027,0.2754,0.1576,0.0517,0.104,0.087,0.081,0.083,0.091,0.078,0.076,0.07310469314079422,0.08888888888888889]},{"programa":"TECNOLOGÍA EN GESTIÓN AMBIENTAL INDUSTRIAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.2012,0.1968,0.1242,0.1711,0.1702,0.0897,0.2,0.0467,0.1798,0.199,0.0847,0.0664,0.104,0.056,0.051,0.082,0.08,0.106,0.06,0.06976744186046512,0.040229885057471264]},{"programa":"TECNOLOGÍA EN GESTIÓN CONTABLE","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.0777479892761394,0.08247422680412371]},{"programa":"TECNOLOGÍA EN GESTIÓN DE MARKETING","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[null,null,null,null,null,null,null,null,null,null,null,null,0.04,0.128,0.103,0.092,0.135,0.095,0.098,0.0625,0.1003584229390681]},{"programa":"TECNOLOGÍA EN GESTIÓN DE NEGOCIOS INTERNACIONALES","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.1835,0.1746,0.2245,0.2038,0.1494,0.1083,0.1972,0.1579,0.1707,0.2557,0.1705,0.0721,0.095,0.1,0.077,0.073,0.081,0.091,0.049,0.06521739130434782,0.06101190476190476]},{"programa":"TECNOLOGIA EN GESTION REDES DE COMPUTADORES Y SEGURIDAD INFORMATICA","grado":"Tecnológico","facultad":"Ingeniería","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.12,0.116,0.083,0.12087912087912088,0.07920792079207921]},{"programa":"TECNOLOGÍA EN GESTIÓN FINANCIERA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.2008,0.2085,0.2611,0.1872,0.141,0.1192,0.2089,0.1733,0.1204,0.1545,0.1181,0.0714,0.101,0.077,0.099,0.057,0.07,0.102,0.056,0.11392405063291139,0.07627118644067797]},{"programa":"TECNOLOGÍA EN GESTIÓN LOGÍSTICA Y PORTUARIA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.2328,0.146,0.1976,0.1994,0.1881,0.1102,0.1922,0.1736,0.2161,0.1828,0.1389,0.0797,0.116,0.096,0.086,0.085,0.077,0.076,0.087,0.09201623815967523,0.10153482880755609]},{"programa":"TECNOLOGÍA EN GESTIÓN TURÍSTICA Y HOTELERA","grado":"Tecnológico","facultad":"Ciencias económicas, administrativas y contables","serie":[0.1714,0.177,0.2034,0.1885,0.1894,0.0952,0.2672,0.1733,0.0905,0.156,0.1168,0.1145,0.072,0.065,0.083,0.062,0.063,0.099,0.084,0.07033639143730887,0.06741573033707865]},{"programa":"TECNOLOGÍA EN INSTRUMENTACIÓN INDUSTRIAL.","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.2629,0.267,0.2302,0.207,0.2165,0.0592,0.1726,0.1159,0.0568,0.5135,0.32,0.0686,0.109,0.16,0.184,0.045,0.13,0.07,0.065,0.037037037037037035,0]},{"programa":"TECNOLOGÍA EN OPERACIÓN DE PLANTAS Y PROCESOS INDUSTRIALES","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.3026,0.2394,0.234,0.1921,0.2007,0.2021,0.1908,0.0745,0.2741,0.3145,0.2397,0.0757,0.135,0.134,0.099,0.082,0.104,0.137,0.077,0.13392857142857142,0.14]},{"programa":"TECNOLOGIA EN PRODUCCIÓN INDUSTRIAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.1918,0.1611,0.1971,0.2088,0.1228,0.0947,0.1545,0.1087,0.1973,0.2311,0.1533,0.0659,0.118,0.063,0.07,0.086,0.072,0.091,0.078,0.0842911877394636,0.06391752577319587]},{"programa":"TECNOLOGÍA EN PROMOCIÓN SOCIAL","grado":"Tecnológico","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0.03225806451612903]},{"programa":"TECNOLOGÍA EN SEGURIDAD E HIGIENE OCUPACIONAL","grado":"Tecnológico","facultad":"Ingeniería","serie":[0.2269,0.225,0.1432,0.2053,0.1513,0.1096,0.2015,0.1561,0.1897,0.2907,0.24,0.0767,0.111,0.125,0.081,0.088,0.082,0.123,0.055,0.07565011820330969,0.07834101382488479]},{"programa":"TRABAJO SOCIAL","grado":"Profesional","facultad":"Ciencias sociales y humanas","serie":[null,null,null,null,null,null,null,null,0.0458,0.2059,0.1569,0.0364,0.073,0.028,0.047,0.051,0.036,0.04,0.026,0.028503562945368172,0.02588235294117647]}],"institucional":{"programa":"INSTITUCIONAL","grado":"-----","facultad":"-----","serie":[0.1937,0.1798,0.1673,0.1834,0.1389,0.1052,0.1486,0.1249,0.1653,0.1881,0.1326,0.0882,0.092,0.088,0.073,0.061,0.072,0.08,0.065,0.06566377511804107,0.06669407049635187]}},"resumen":{"hoja":"TDA 2026-1","periodo":"2026-1","columnas":[{"clave":"matriculados","etiqueta":"Matriculados 2025-1"},{"clave":"matriculados_2","etiqueta":"Matriculados 2025-2"},{"clave":"ausentes","etiqueta":"Ausentes 2025-2 (Posibles desertores)"},{"clave":"reingresos","etiqueta":"Reingresos 2026-1"},{"clave":"graduados","etiqueta":"Graduados"},{"clave":"fima","etiqueta":"Finalizados académicamente (FIMA)"},{"clave":"desertores","etiqueta":"Desertores (no matriculados 2025-2 y 2026-1)"},{"clave":"tasa","etiqueta":"TDA 2026-1"}],"filas":[{"programa":"ADMINISTRACIÓN DE EMPRESAS","matriculados":601,"matriculados_2":458,"ausentes":143,"reingresos":11,"graduados":103,"fima":6,"desertores":23,"tasa":0.03826955074875208},{"programa":"ADMINISTRACIÓN EN SEGURIDAD Y SALUD EN EL TRABAJO","matriculados":74,"matriculados_2":52,"ausentes":22,"reingresos":1,"graduados":18,"fima":null,"desertores":3,"tasa":0.04054054054054054},{"programa":"CONTADURÍA PÚBLICA","matriculados":250,"matriculados_2":187,"ausentes":63,"reingresos":10,"graduados":38,"fima":2,"desertores":13,"tasa":0.052},{"programa":"DERECHO","matriculados":398,"matriculados_2":334,"ausentes":64,"reingresos":18,"graduados":5,"fima":24,"desertores":17,"tasa":0.04271356783919598},{"programa":"INGENIERÍA AMBIENTAL","matriculados":93,"matriculados_2":66,"ausentes":27,"reingresos":4,"graduados":14,"fima":4,"desertores":5,"tasa":0.053763440860215055},{"programa":"INGENIERÍA CIVIL","matriculados":390,"matriculados_2":347,"ausentes":43,"reingresos":12,"graduados":11,"fima":1,"desertores":19,"tasa":0.04871794871794872},{"programa":"INGENIERÍA DE PROCESOS","matriculados":80,"matriculados_2":52,"ausentes":28,"reingresos":4,"graduados":6,"fima":12,"desertores":6,"tasa":0.075},{"programa":"INGENIERÍA DE SISTEMAS","matriculados":280,"matriculados_2":241,"ausentes":39,"reingresos":5,"graduados":21,"fima":2,"desertores":11,"tasa":0.039285714285714285},{"programa":"INGENIERÍA ELECTRÓNICA","matriculados":110,"matriculados_2":77,"ausentes":33,"reingresos":1,"graduados":28,"fima":null,"desertores":4,"tasa":0.03636363636363636},{"programa":"INGENIERÍA INDUSTRIAL","matriculados":589,"matriculados_2":422,"ausentes":167,"reingresos":22,"graduados":100,"fima":22,"desertores":23,"tasa":0.03904923599320883},{"programa":"LICENCIATURA EN EDUCACION INFANTIL","matriculados":46,"matriculados_2":38,"ausentes":8,"reingresos":0,"graduados":null,"fima":null,"desertores":8,"tasa":0.17391304347826086},{"programa":"NEGOCIOS INTERNACIONALES PROFESIONAL","matriculados":67,"matriculados_2":67,"ausentes":0,"reingresos":0,"graduados":null,"fima":null,"desertores":0,"tasa":0},{"programa":"PSICOLOGÍA","matriculados":376,"matriculados_2":308,"ausentes":68,"reingresos":6,"graduados":50,"fima":1,"desertores":11,"tasa":0.02925531914893617},{"programa":"TECNOLOGÍA EN CONSTRUCCIONES CIVILES","matriculados":63,"matriculados_2":54,"ausentes":9,"reingresos":0,"graduados":null,"fima":null,"desertores":9,"tasa":0.14285714285714285},{"programa":"TECNOLOGÍA EN CONTROL DE CALIDAD","matriculados":175,"matriculados_2":153,"ausentes":22,"reingresos":5,"graduados":7,"fima":null,"desertores":10,"tasa":0.05714285714285714},{"programa":"TECNOLOGÍA EN CONTROL ELECTRÓNICO DE PROCESOS","matriculados":141,"matriculados_2":121,"ausentes":20,"reingresos":3,"graduados":1,"fima":1,"desertores":15,"tasa":0.10638297872340426},{"programa":"TECNOLOGÍA EN DESARROLLO DE SOFTWARE","matriculados":1215,"matriculados_2":1052,"ausentes":163,"reingresos":26,"graduados":19,"fima":10,"desertores":108,"tasa":0.08888888888888889},{"programa":"TECNOLOGÍA EN GESTIÓN AMBIENTAL INDUSTRIAL","matriculados":174,"matriculados_2":160,"ausentes":14,"reingresos":4,"graduados":2,"fima":1,"desertores":7,"tasa":0.040229885057471264},{"programa":"TECNOLOGÍA EN GESTIÓN CONTABLE","matriculados":485,"matriculados_2":419,"ausentes":66,"reingresos":15,"graduados":8,"fima":3,"desertores":40,"tasa":0.08247422680412371},{"programa":"TECNOLOGÍA EN GESTIÓN DE MARKETING","matriculados":279,"matriculados_2":241,"ausentes":38,"reingresos":2,"graduados":7,"fima":1,"desertores":28,"tasa":0.1003584229390681},{"programa":"TECNOLOGÍA EN GESTIÓN DE NEGOCIOS INTERNACIONALES","matriculados":672,"matriculados_2":585,"ausentes":87,"reingresos":19,"graduados":25,"fima":2,"desertores":41,"tasa":0.06101190476190476},{"programa":"TECNOLOGÍA EN GESTIÓN DE REDES DE COMPUTADORES Y SEGURIDAD INFORMÁTICA","matriculados":101,"matriculados_2":92,"ausentes":9,"reingresos":1,"graduados":null,"fima":null,"desertores":8,"tasa":0.07920792079207921},{"programa":"TECNOLOGÍA EN GESTIÓN FINANCIERA","matriculados":236,"matriculados_2":181,"ausentes":55,"reingresos":12,"graduados":24,"fima":1,"desertores":18,"tasa":0.07627118644067797},{"programa":"TECNOLOGÍA EN GESTIÓN LOGÍSTICA Y PORTUARIA","matriculados":847,"matriculados_2":686,"ausentes":161,"reingresos":27,"graduados":40,"fima":8,"desertores":86,"tasa":0.10153482880755609},{"programa":"TECNOLOGÍA EN GESTIÓN TURÍSTICA Y HOTELERA","matriculados":356,"matriculados_2":307,"ausentes":49,"reingresos":10,"graduados":13,"fima":2,"desertores":24,"tasa":0.06741573033707865},{"programa":"TECNOLOGÍA EN INSTRUMENTACIÓN INDUSTRIAL.","matriculados":8,"matriculados_2":4,"ausentes":4,"reingresos":0,"graduados":4,"fima":null,"desertores":0,"tasa":0},{"programa":"TECNOLOGÍA EN OPERACIÓN DE PLANTAS Y PROCESOS INDUSTRIALES","matriculados":250,"matriculados_2":188,"ausentes":62,"reingresos":12,"graduados":13,"fima":2,"desertores":35,"tasa":0.14},{"programa":"TECNOLOGIA EN PRODUCCIÓN INDUSTRIAL","matriculados":485,"matriculados_2":421,"ausentes":64,"reingresos":14,"graduados":15,"fima":4,"desertores":31,"tasa":0.06391752577319587},{"programa":"TECNOLOGÍA EN PROMOCIÓN SOCIAL","matriculados":31,"matriculados_2":30,"ausentes":1,"reingresos":0,"graduados":null,"fima":null,"desertores":1,"tasa":0.03225806451612903},{"programa":"TECNOLOGÍA EN SEGURIDAD E HIGIENE OCUPACIONAL","matriculados":434,"matriculados_2":361,"ausentes":73,"reingresos":18,"graduados":19,"fima":2,"desertores":34,"tasa":0.07834101382488479},{"programa":"TRABAJO SOCIAL","matriculados":425,"matriculados_2":374,"ausentes":51,"reingresos":4,"graduados":36,"fima":null,"desertores":11,"tasa":0.02588235294117647}],"total":{"programa":"Total general","matriculados":9731,"matriculados_2":8078,"ausentes":1653,"reingresos":266,"graduados":627,"fima":111,"desertores":649,"tasa":0.06669407049635187}}}};
+
+/* =========================================================
+   Utilidades
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = {};
+function leerColores(){
+  ['--azul','--rojo','--azul-900','--tinta','--tinta-2','--tenue','--rejilla','--borde','--punto','--ref','--tarjeta']
+    .forEach(n => C[n.slice(2)] = css(n));
+}
+const nf1 = new Intl.NumberFormat('es-CO',{minimumFractionDigits:1,maximumFractionDigits:1});
+const nf0 = new Intl.NumberFormat('es-CO',{maximumFractionDigits:0});
+const pct = v => v == null ? '—' : nf1.format(v*100) + ' %';
+const pctEje = v => nf0.format(v*100) + ' %';
+const pp = v => v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '±') + nf1.format(Math.abs(v*100)) + ' pp';
+const ent = v => v == null ? '—' : nf0.format(v);
+const flecha = v => v == null ? '' : v > 0.0005 ? '▲' : v < -0.0005 ? '▼' : '•';
+
+const MENORES = new Set(['de','del','en','y','e','la','el','los','las','a','para']);
+const ACENTOS = {tecnologia:'tecnología',gestion:'gestión',informatica:'informática',educacion:'educación',produccion:'producción',administracion:'administración',ingenieria:'ingeniería',psicologia:'psicología',contaduria:'contaduría',publica:'pública'};
+function titulo(s){
+  return String(s||'').toLowerCase().replace(/\s+/g,' ').trim().replace(/\.$/,'').split(' ')
+    .map((w,i) => { w = ACENTOS[w] || w; return (i>0 && MENORES.has(w)) ? w : w.charAt(0).toUpperCase()+w.slice(1); })
+    .join(' ');
+}
+function corto(s){
+  let t = s.replace(/^Tecnología en /,'Tec. ').replace(/^Ingeniería /,'Ing. ').replace(/^Licenciatura en /,'Lic. ')
+           .replace(/^Administración en /,'Adm. en ').replace(/ Profesional$/,'');
+  return t.length > 38 ? t.slice(0,36).trim() + '…' : t;
+}
+function clave(s){
+  return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase()
+    .replace(/[^A-Z0-9 ]/g,' ').split(/\s+/)
+    .filter(w => w && !['DE','DEL','EN','Y','E','LA','EL','LOS','LAS'].includes(w)).join(' ');
+}
+function el(tag, attrs, ...hijos){
+  const n = document.createElement(tag);
+  if (attrs) for (const k in attrs){
+    if (k === 'class') n.className = attrs[k];
+    else if (k === 'text') n.textContent = attrs[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), attrs[k]);
+    else n.setAttribute(k, attrs[k]);
+  }
+  hijos.flat().forEach(h => h != null && n.append(h.nodeType ? h : document.createTextNode(h)));
+  return n;
+}
+const almacen = {
+  leer(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  guardar(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* =========================================================
+   Estado
+   ========================================================= */
+const estado = {
+  datos: null,         // modelo procesado
+  origen: '',          // 'vivo' | 'respaldo'
+  f: { periodo:null, semestre:'Todos', facultad:'Todas', grado:'Todos', programa:'Todos' },
+  calor: 'tai',
+  orden: { col:'tai', dir:-1 },
+  busqueda: ''
+};
+
+/* =========================================================
+   Modelo de datos
+   ========================================================= */
+function construirModelo(p){
+  const periodos = p.tai.historico.periodos.slice();
+  p.tda.historico.periodos.forEach(x => { if (!periodos.includes(x)) periodos.push(x); });
+  const idx = (lista, per) => lista.indexOf(per);
+  const alinear = (serie, lista) => periodos.map(per => { const i = idx(lista, per); return i < 0 ? null : serie[i]; });
+
+  const mapa = new Map();
+  const tomar = (nombre) => {
+    const k = clave(nombre);
+    if (!mapa.has(k)) mapa.set(k, { k, nombre: titulo(nombre), grado:'', facultad:'', tai:null, tda:null, rTai:null, rTda:null });
+    return mapa.get(k);
+  };
+  p.tai.historico.programas.forEach(r => { const o = tomar(r.programa); o.grado = r.grado || o.grado; o.facultad = r.facultad || o.facultad; o.tai = alinear(r.serie, p.tai.historico.periodos); });
+  p.tda.historico.programas.forEach(r => { const o = tomar(r.programa); o.grado = o.grado || r.grado; o.facultad = o.facultad || r.facultad; o.tda = alinear(r.serie, p.tda.historico.periodos); });
+  p.tai.resumen.filas.forEach(r => { const o = mapa.get(clave(r.programa)); if (o) o.rTai = r; });
+  p.tda.resumen.filas.forEach(r => { const o = mapa.get(clave(r.programa)); if (o) o.rTda = r; });
+
+  const programas = [...mapa.values()].filter(o => o.facultad || o.grado);
+  programas.forEach(o => { o.corto = corto(o.nombre); });
+  programas.sort((a,b) => a.nombre.localeCompare(b.nombre,'es'));
+
+  const ultTai = p.tai.historico.ultimoPeriodo, ultTda = p.tda.historico.ultimoPeriodo;
+  const ultimo = periodos.indexOf(ultTai) > periodos.indexOf(ultTda) ? ultTai : ultTda;
+  const visibles = periodos.slice(0, periodos.indexOf(ultimo) + 1);
+
+  return {
+    periodos: visibles,
+    ultimo,
+    programas,
+    inst: {
+      tai: p.tai.historico.institucional ? alinear(p.tai.historico.institucional.serie, p.tai.historico.periodos).slice(0, visibles.length) : null,
+      tda: p.tda.historico.institucional ? alinear(p.tda.historico.institucional.serie, p.tda.historico.periodos).slice(0, visibles.length) : null
+    },
+    totTai: p.tai.resumen.total, totTda: p.tda.resumen.total,
+    colTda: p.tda.resumen.columnas, colTai: p.tai.resumen.columnas,
+    fuentes: p.fuentes || {}, generado: p.generado
+  };
+}
+
+/* ---- Selecciones derivadas de los filtros ---- */
+function periodosVisibles(){
+  const s = estado.f.semestre;
+  return estado.datos.periodos.filter(x => s === 'Todos' || x.endsWith('-' + s));
+}
+function iPeriodo(){ return estado.datos.periodos.indexOf(estado.f.periodo); }
+function iAnterior(){
+  const per = estado.datos.periodos, i = iPeriodo();
+  return estado.f.semestre === 'Todos' ? i - 1 : i - 2;
+}
+function enGrupo(o, ignorarPrograma){
+  const f = estado.f;
+  return (f.facultad === 'Todas' || o.facultad === f.facultad) &&
+         (f.grado === 'Todos' || o.grado === f.grado) &&
+         (ignorarPrograma || f.programa === 'Todos' || o.k === f.programa);
+}
+function grupo(ignorarPrograma){ return estado.datos.programas.filter(o => enGrupo(o, ignorarPrograma)); }
+function hayFiltroGrupo(){ const f = estado.f; return f.facultad !== 'Todas' || f.grado !== 'Todos' || f.programa !== 'Todos'; }
+function programaSel(){ return estado.f.programa === 'Todos' ? null : estado.datos.programas.find(o => o.k === estado.f.programa); }
+
+/** Tasa del grupo filtrado en el periodo i. */
+function tasaGrupo(t, i){
+  const d = estado.datos;
+  if (i < 0) return { v:null };
+  if (!hayFiltroGrupo()) return { v: d.inst[t] ? d.inst[t][i] : null, metodo:'institucional' };
+  const sel = programaSel();
+  if (sel) return { v: sel[t] ? sel[t][i] : null, metodo:'programa' };
+  const g = grupo();
+  if (d.periodos[i] === d.ultimo){
+    let num = 0, den = 0, n = 0;
+    g.forEach(o => {
+      const r = t === 'tai' ? o.rTai : o.rTda;
+      const nu = r ? (t === 'tai' ? r.noRenovaron : r.desertores) : null;
+      if (r && r.matriculados && nu != null){ num += nu; den += r.matriculados; n++; }
+    });
+    if (den) return { v: num/den, metodo:'ponderado', n, num, den };
+  }
+  const vals = g.map(o => o[t] ? o[t][i] : null).filter(v => v != null);
+  return { v: vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null, metodo:'promedio', n: vals.length };
+}
+function etiquetaGrupo(){
+  const f = estado.f, sel = programaSel();
+  if (sel) return sel.nombre;
+  if (!hayFiltroGrupo()) return 'Institucional';
+  return [f.facultad !== 'Todas' ? f.facultad : null, f.grado !== 'Todos' ? f.grado : null].filter(Boolean).join(' · ');
+}
+function cuadrante(x, y, rx, ry){
+  if (x == null || y == null || rx == null || ry == null) return null;
+  const a = x > rx, b = y > ry;
+  return a && b ? 'alerta' : a ? 'retorno' : b ? 'silenciosa' : 'estable';
+}
+const CUADS = {
+  alerta:    { nombre:'Alerta prioritaria',   icono:'⚠', def:'TAI y TDA por encima de la institucional' },
+  silenciosa:{ nombre:'Deserción silenciosa', icono:'◆', def:'TAI por debajo, pero TDA por encima' },
+  retorno:   { nombre:'Se ausentan y vuelven', icono:'↺', def:'TAI por encima, TDA por debajo' },
+  estable:   { nombre:'Estable',              icono:'✓', def:'TAI y TDA por debajo de la institucional' }
+};
+
+/* =========================================================
+   Filtros
+   ========================================================= */
+function opciones(sel, lista, valor){
+  sel.replaceChildren(...lista.map(([v,t]) => { const o = el('option', {value:v, text:t}); if (v === valor) o.selected = true; return o; }));
+}
+function poblarFiltros(){
+  const d = estado.datos, f = estado.f;
+  const vis = periodosVisibles();
+  if (!vis.includes(f.periodo)) f.periodo = vis[vis.length-1];
+  opciones($('#f-periodo'), vis.slice().reverse().map(x => [x, x + (x === d.ultimo ? ' (actual)' : '')]), f.periodo);
+
+  const facs = [...new Set(d.programas.map(o => o.facultad).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+  if (f.facultad !== 'Todas' && !facs.includes(f.facultad)) f.facultad = 'Todas';
+  opciones($('#f-facultad'), [['Todas','Todas'], ...facs.map(x => [x,x])], f.facultad);
+
+  const grados = [...new Set(d.programas.filter(o => f.facultad === 'Todas' || o.facultad === f.facultad).map(o => o.grado).filter(Boolean))].sort();
+  if (f.grado !== 'Todos' && !grados.includes(f.grado)) f.grado = 'Todos';
+  opciones($('#f-grado'), [['Todos','Todos'], ...grados.map(x => [x,x])], f.grado);
+
+  const progs = grupo(true);
+  if (f.programa !== 'Todos' && !progs.some(o => o.k === f.programa)) f.programa = 'Todos';
+  opciones($('#f-programa'), [['Todos','Todos los programas (' + progs.length + ')'], ...progs.map(o => [o.k, o.nombre])], f.programa);
+
+  document.querySelectorAll('#f-semestre button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === f.semestre)));
+}
+function guardarHash(){
+  const f = estado.f, q = new URLSearchParams();
+  if (f.periodo && f.periodo !== estado.datos.ultimo) q.set('periodo', f.periodo);
+  if (f.semestre !== 'Todos') q.set('semestre', f.semestre);
+  if (f.facultad !== 'Todas') q.set('facultad', f.facultad);
+  if (f.grado !== 'Todos') q.set('grado', f.grado);
+  if (f.programa !== 'Todos') q.set('programa', f.programa);
+  if (estado.calor !== 'tai') q.set('calor', estado.calor);
+  const s = q.toString();
+  try { history.replaceState(null, '', s ? '#' + s : location.pathname + location.search); } catch(e){}
+}
+function leerHash(){
+  const q = new URLSearchParams(location.hash.slice(1));
+  const f = estado.f;
+  if (q.get('periodo')) f.periodo = q.get('periodo');
+  if (['I','II'].includes(q.get('semestre'))) f.semestre = q.get('semestre');
+  if (q.get('facultad')) f.facultad = q.get('facultad');
+  if (q.get('grado')) f.grado = q.get('grado');
+  if (q.get('programa')) f.programa = q.get('programa');
+  if (q.get('calor') === 'tda') estado.calor = 'tda';
+}
+function cambiar(campo, valor){
+  estado.f[campo] = valor;
+  if (campo === 'facultad' || campo === 'grado') { /* el programa se valida en poblarFiltros */ }
+  render();
+}
+
+/* =========================================================
+   Render
+   ========================================================= */
+const graficos = {};
+function grafico(id){
+  if (!graficos[id]) graficos[id] = echarts.init(document.getElementById(id), null, { renderer:'svg' });
+  return graficos[id];
+}
+
+function render(){
+  if (!estado.datos) return;
+  leerColores();
+  poblarFiltros();
+  guardarHash();
+  renderContexto();
+  renderKPIs();
+  renderRiesgo();
+  renderEvolucion();
+  renderVariacion();
+  renderCalor();
+  renderTabla();
+  renderPie();
+}
+
+function renderContexto(){
+  const d = estado.datos, f = estado.f, i = iPeriodo(), ia = iAnterior();
+  const ant = ia >= 0 ? d.periodos[ia] : null;
+  const p = $('#contexto'); p.replaceChildren();
+  p.append('Periodo ', el('b',{text:f.periodo}), ant ? ' comparado con ' : '', ant ? el('b',{text:ant}) : '',
+           ' · Grupo: ', el('b',{text:etiquetaGrupo()}),
+           ' · ', String(grupo().length), grupo().length === 1 ? ' programa' : ' programas');
+}
+
+/* ---------- KPIs ---------- */
+function spark(serieVals, color, punteada){
+  const vals = serieVals.map(v => v == null ? null : v);
+  const finitos = vals.filter(v => v != null);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','spark'); svg.setAttribute('viewBox','0 0 200 34'); svg.setAttribute('preserveAspectRatio','none'); svg.setAttribute('aria-hidden','true');
+  if (finitos.length < 2) return svg;
+  const max = Math.max(...finitos), min = Math.min(...finitos), rango = (max - min) || 1;
+  let dpath = '', mover = true;
+  vals.forEach((v,j) => {
+    if (v == null){ mover = true; return; }
+    const x = (j/(vals.length-1))*196 + 2, y = 30 - ((v-min)/rango)*26;
+    dpath += (mover ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' '; mover = false;
+  });
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', dpath); path.setAttribute('fill','none'); path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width','2'); path.setAttribute('vector-effect','non-scaling-stroke');
+  path.setAttribute('stroke-linejoin','round'); path.setAttribute('stroke-linecap','round');
+  if (punteada) path.setAttribute('stroke-dasharray','5 3');
+  svg.append(path);
+  return svg;
+}
+function kpiTasa(t){
+  const d = estado.datos, i = iPeriodo(), ia = iAnterior();
+  const act = tasaGrupo(t, i), ant = tasaGrupo(t, ia);
+  const delta = act.v != null && ant.v != null ? act.v - ant.v : null;
+  const nodo = $('#kpi-' + t); nodo.replaceChildren();
+  const nombre = t === 'tai' ? 'TAI · Ausencia intersemestral' : 'TDA · Deserción anual';
+  nodo.append(el('div',{class:'titulo'}, el('i',{class:'marca-serie ' + t}), nombre));
+  const val = el('div',{class:'valor'});
+  if (act.v == null) val.textContent = '—';
+  else { val.append(nf1.format(act.v*100)); val.append(el('small',{text:'%'})); }
+  nodo.append(val);
+  const ia2 = ia >= 0 ? d.periodos[ia] : null;
+  const de = el('div',{class:'delta'});
+  if (delta != null) de.append(el('b',{text: flecha(delta) + ' ' + pp(delta)}), ' frente a ' + ia2 + (delta > 0.0005 ? ' (sube)' : delta < -0.0005 ? ' (baja)' : ''));
+  else de.append(ia2 ? 'Sin dato en ' + ia2 + ' para comparar' : 'Sin periodo anterior para comparar');
+  nodo.append(de);
+  const vis = periodosVisibles().map(x => d.periodos.indexOf(x)).filter(j => j <= i);
+  nodo.append(spark(vis.map(j => tasaGrupo(t, j).v), t === 'tai' ? C.azul : C.rojo, t === 'tda'));
+  let det = '';
+  if (act.metodo === 'ponderado') det = t === 'tai' ? `${ent(act.num)} de ${ent(act.den)} matriculados no renovaron` : `${ent(act.num)} desertores de ${ent(act.den)} matriculados`;
+  else if (act.metodo === 'institucional' && d.periodos[i] === d.ultimo){
+    const tot = t === 'tai' ? d.totTai : d.totTda;
+    if (tot) det = t === 'tai' ? `${ent(tot.noRenovaron)} de ${ent(tot.matriculados)} matriculados no renovaron` : `${ent(tot.desertores)} desertores de ${ent(tot.matriculados)} matriculados`;
+  }
+  else if (act.metodo === 'programa' && d.periodos[i] === d.ultimo){
+    const sel = programaSel(), r = sel && (t === 'tai' ? sel.rTai : sel.rTda);
+    if (r) det = t === 'tai' ? `${ent(r.noRenovaron)} de ${ent(r.matriculados)} matriculados no renovaron` : `${ent(r.desertores)} desertores de ${ent(r.matriculados)} matriculados`;
+    else if (!r && t === 'tda') det = 'Este programa no tiene TDA';
+  }
+  else if (act.metodo === 'promedio') det = `Promedio simple de ${act.n} programas`;
+  nodo.append(el('div',{class:'detalle', text: det || 'Tasa institucional oficial'}));
+}
+function renderKPIs(){
+  kpiTasa('tai'); kpiTasa('tda');
+  const d = estado.datos, i = iPeriodo();
+  const rx = d.inst.tai ? d.inst.tai[i] : null, ry = d.inst.tda ? d.inst.tda[i] : null;
+  const g = grupo();
+  const enAlerta = g.filter(o => cuadrante(o.tai && o.tai[i], o.tda && o.tda[i], rx, ry) === 'alerta')
+    .sort((a,b) => (b.tai[i]+b.tda[i]) - (a.tai[i]+a.tda[i]));
+  const conAmbas = g.filter(o => o.tai && o.tda && o.tai[i] != null && o.tda[i] != null).length;
+  const n = $('#kpi-alerta'); n.replaceChildren();
+  n.append(el('div',{class:'titulo', text:'⚠ Programas en alerta prioritaria'}));
+  const v = el('div',{class:'valor'}); v.append(String(enAlerta.length)); v.append(el('small',{text:' de ' + conAmbas}));
+  n.append(v);
+  n.append(el('div',{class:'delta', text:'TAI y TDA por encima de la tasa institucional'}));
+  const ul = el('ul',{class:'lista-mini'});
+  enAlerta.slice(0,3).forEach(o => ul.append(el('li',null, el('span',{text:o.corto, title:o.nombre}), el('span',{text: pct(o.tai[i]) + ' · ' + pct(o.tda[i])}))));
+  if (!enAlerta.length) ul.append(el('li',null, el('span',{text:'Ningún programa del grupo'})));
+  n.append(ul);
+
+  const m = $('#kpi-mayores'); m.replaceChildren();
+  m.append(el('div',{class:'titulo', text:'Tasas más altas del grupo'}));
+  ['tai','tda'].forEach(t => {
+    const cands = g.filter(o => o[t] && o[t][i] != null).sort((a,b) => b[t][i] - a[t][i]);
+    const top = cands[0];
+    const bloque = el('div',null,
+      el('div',{class:'delta'}, el('i',{class:'marca-serie ' + t, style:'display:inline-block;margin-right:6px'}), t.toUpperCase() + ' más alta'),
+      el('div',{class:'grande', text: top ? top.corto : '—', title: top ? top.nombre : ''}),
+      el('div',{class:'detalle', text: top ? pct(top[t][i]) + (cands.length > 1 ? ' · siguiente: ' + cands[1].corto + ' ' + pct(cands[1][t][i]) : '') : 'Sin datos'})
+    );
+    bloque.style.marginBottom = '6px';
+    m.append(bloque);
+  });
+}
+
+/* ---------- Mapa de riesgo ---------- */
+function renderRiesgo(){
+  const d = estado.datos, i = iPeriodo(), sel = programaSel();
+  const rx = d.inst.tai ? d.inst.tai[i] : null, ry = d.inst.tda ? d.inst.tda[i] : null;
+  const contexto = grupo(true);  // el filtro de programa resalta, no oculta
+  const pts = contexto.filter(o => o.tai && o.tda && o.tai[i] != null && o.tda[i] != null);
+  const sinTda = contexto.filter(o => o.tai && o.tai[i] != null && !(o.tda && o.tda[i] != null));
+  const xs = pts.map(o => o.tai[i]).concat(rx || 0), ys = pts.map(o => o.tda[i]).concat(ry || 0);
+  const techo = v => Math.ceil(v * 1.06 / 0.05) * 0.05;
+  const maxX = techo(Math.max(0.05, ...xs)), maxY = techo(Math.max(0.05, ...ys));
+  // Etiquetas: los 5 programas más alejados de la referencia (en alerta) + el seleccionado
+  const etiquetar = new Set(pts.filter(o => cuadrante(o.tai[i], o.tda[i], rx, ry) === 'alerta')
+    .sort((a,b) => ((b.tai[i]-rx)/rx + (b.tda[i]-ry)/ry) - ((a.tai[i]-rx)/rx + (a.tda[i]-ry)/ry)).slice(0,5).map(o => o.k));
+  if (sel) etiquetar.add(sel.k);
+
+  $('#sub-riesgo').textContent = `Periodo ${estado.f.periodo}. Cada figura es un programa; las líneas grises marcan la tasa institucional (TAI ${pct(rx)} · TDA ${pct(ry)}).`;
+  $('#nota-riesgo').textContent = sinTda.length ? 'Sin TDA en este periodo (solo aparecen en la tabla): ' + sinTda.map(o => o.corto).join(', ') + '.' : '';
+
+  const data = pts.map(o => {
+    const esSel = sel && sel.k === o.k, atenuado = sel && !esSel;
+    return {
+      name: o.nombre, value: [o.tai[i], o.tda[i]], k: o.k,
+      symbol: o.grado === 'Profesional' ? 'circle' : 'diamond',
+      symbolSize: esSel ? 18 : o.grado === 'Profesional' ? 12 : 14,
+      itemStyle: { color: esSel ? C['azul-900'] : C.punto, opacity: atenuado ? 0.22 : 0.88, borderColor: esSel ? C.rojo : '#fff', borderWidth: esSel ? 3 : 1.5 },
+      label: { show: etiquetar.has(o.k) && !atenuado, formatter: o.corto, position: o.tai[i] > maxX * 0.62 ? 'left' : 'right', distance: 7, fontSize: 11.5, color: C['tinta-2'], fontFamily: 'IBM Plex Sans' },
+      o
+    };
+  });
+  const tituloEje = (t) => ({ name: t, nameLocation:'middle', nameGap: 30, nameTextStyle:{ color:C['tinta-2'], fontSize:12.5, fontWeight:600 } });
+  grafico('g-riesgo').setOption({
+    animationDurationUpdate: 650,
+    textStyle:{ fontFamily:'IBM Plex Sans' },
+    grid:{ left: 54, right: 26, top: 16, bottom: 46 },
+    xAxis: Object.assign({ type:'value', min:0, max: maxX, axisLabel:{ formatter: pctEje, color:C.tenue, fontSize:11.5 }, splitLine:{ lineStyle:{ color:C.rejilla } }, axisLine:{ lineStyle:{ color:C.borde } } }, tituloEje('TAI · Ausencia intersemestral')),
+    yAxis: Object.assign({ type:'value', min:0, max: maxY, axisLabel:{ formatter: pctEje, color:C.tenue, fontSize:11.5 }, splitLine:{ lineStyle:{ color:C.rejilla } }, axisLine:{ lineStyle:{ color:C.borde } } }, tituloEje('TDA · Deserción anual'), { nameGap: 42 }),
+    tooltip:{ trigger:'item', confine:true, backgroundColor:'#fff', borderColor:C.borde, textStyle:{ color:C.tinta, fontSize:12.5 },
+      formatter: (p) => {
+        const o = p.data.o, q = cuadrante(o.tai[i], o.tda[i], rx, ry);
+        return `<div style="font-weight:600;margin-bottom:4px;max-width:260px;white-space:normal">${esc(o.nombre)}</div>` +
+          `<div><span style="display:inline-block;width:12px;border-top:2px solid ${C.azul};margin-right:6px;vertical-align:middle"></span><b>${pct(o.tai[i])}</b> TAI</div>` +
+          `<div><span style="display:inline-block;width:12px;border-top:2px dashed ${C.rojo};margin-right:6px;vertical-align:middle"></span><b>${pct(o.tda[i])}</b> TDA</div>` +
+          `<div style="color:${C.tenue};margin-top:4px">${esc(o.grado)} · ${CUADS[q].icono} ${CUADS[q].nombre}</div>`;
+      } },
+    series:[{
+      type:'scatter', data, cursor:'pointer',
+      labelLayout:{ hideOverlap:true },
+      emphasis:{ scale: 1.35, label:{ show:true } },
+      markLine: rx == null ? undefined : {
+        silent:true, symbol:'none', animation:false,
+        lineStyle:{ color:C.ref, type:'solid', width:1.2 },
+        label:{ color:C.tenue, fontSize:11, formatter:(m) => m.data.lbl },
+        data:[ { xAxis: rx, lbl:'TAI inst. ' + pct(rx), label:{ position:'end' } }, { yAxis: ry, lbl:'TDA inst. ' + pct(ry), label:{ position:'insideEndTop' } } ]
+      },
+      markArea: rx == null ? undefined : {
+        silent:true, animation:false,
+        itemStyle:{ color:'rgba(10,43,94,0.045)' },
+        label:{ color:C['tinta-2'], fontSize:12, fontWeight:600 },
+        data:[
+          [ { xAxis: rx, yAxis: ry, name:'⚠ Alerta prioritaria', label:{ position:'insideTopRight' } }, { xAxis: maxX, yAxis: maxY } ],
+          [ { xAxis: 0, yAxis: ry, name:'◆ Deserción silenciosa', itemStyle:{ color:'rgba(0,0,0,0)' }, label:{ position:'insideTopLeft', color:C.tenue, fontWeight:500 } }, { xAxis: rx, yAxis: maxY } ],
+          [ { xAxis: rx, yAxis: 0, name:'↺ Se ausentan y vuelven', itemStyle:{ color:'rgba(0,0,0,0)' }, label:{ position:'insideBottomRight', color:C.tenue, fontWeight:500 } }, { xAxis: maxX, yAxis: ry } ],
+          [ { xAxis: 0, yAxis: 0, name:'✓ Estable', itemStyle:{ color:'rgba(0,0,0,0)' }, label:{ position:'insideBottomLeft', color:C.tenue, fontWeight:500 } }, { xAxis: rx, yAxis: ry } ]
+        ]
+      }
+    }]
+  }, { replaceMerge:['series'] });
+
+  // Panel de cuadrantes
+  const grupos = { alerta:[], silenciosa:[], retorno:[], estable:[] };
+  pts.forEach(o => { if (sel && o.k !== sel.k) return; grupos[cuadrante(o.tai[i], o.tda[i], rx, ry)].push(o); });
+  const cont = $('#cuadrantes'); cont.replaceChildren();
+  ['alerta','silenciosa','retorno','estable'].forEach(q => {
+    const lista = grupos[q].sort((a,b) => (b.tai[i]+b.tda[i]) - (a.tai[i]+a.tda[i]));
+    const ul = el('ul');
+    lista.forEach(o => ul.append(el('li',null, el('button',{type:'button', text:o.corto, title:o.nombre + ' · TAI ' + pct(o.tai[i]) + ' · TDA ' + pct(o.tda[i]), onclick:() => { estado.f.programa = o.k; render(); }}))));
+    if (!lista.length) ul.append(el('li',{class:'vacio', text:'Ninguno', style:'font-size:12px'}));
+    cont.append(el('div',{class:'cuad' + (q === 'alerta' ? ' alerta' : '')},
+      el('h3',null, el('span',{text: CUADS[q].icono + ' ' + CUADS[q].nombre}), el('span',{class:'n', text:String(lista.length)})),
+      el('p',{class:'def', text: CUADS[q].def}),
+      ul));
+  });
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Evolución ---------- */
+function renderEvolucion(){
+  const d = estado.datos, vis = periodosVisibles(), idxs = vis.map(x => d.periodos.indexOf(x));
+  const filtrado = hayFiltroGrupo();
+  const etq = etiquetaGrupo();
+  const serieDe = (t) => idxs.map(j => tasaGrupo(t, j).v);
+  const ultimoNoNulo = (arr) => { for (let j = arr.length-1; j >= 0; j--) if (arr[j] != null) return j; return -1; };
+  const conEtiqueta = (arr, color) => { const u = ultimoNoNulo(arr); return arr.map((v,j) => j === u && v != null ? { value:v, label:{ show:true, position:'right', formatter: pct(v), color:C.tinta, fontSize:11.5, fontWeight:600 } } : v); };
+
+  const tai = serieDe('tai'), tda = serieDe('tda');
+  const series = [
+    { name: 'TAI · ' + (filtrado ? 'grupo' : 'institucional'), type:'line', data: conEtiqueta(tai), color:C.azul, symbol:'circle', symbolSize:7, showSymbol:true, lineStyle:{ width:2.2 }, connectNulls:false, z:3 },
+    { name: 'TDA · ' + (filtrado ? 'grupo' : 'institucional'), type:'line', data: conEtiqueta(tda), color:C.rojo, symbol:'diamond', symbolSize:9, showSymbol:true, lineStyle:{ width:2.2, type:'dashed' }, connectNulls:false, z:3 }
+  ];
+  if (filtrado){
+    series.push({ name:'TAI institucional', type:'line', data: idxs.map(j => d.inst.tai ? d.inst.tai[j] : null), color:'#9AA6BA', symbol:'none', lineStyle:{ width:1.4 }, z:1 });
+    series.push({ name:'TDA institucional', type:'line', data: idxs.map(j => d.inst.tda ? d.inst.tda[j] : null), color:'#9AA6BA', symbol:'none', lineStyle:{ width:1.4, type:'dashed' }, z:1 });
+  }
+  series[0].markLine = { silent:true, symbol:'none', animation:false, lineStyle:{ color:C['azul-900'], width:1, type:'solid', opacity:.35 }, label:{ formatter: estado.f.periodo, color:C.tenue, fontSize:11, position:'insideEndTop' }, data:[ { xAxis: estado.f.periodo } ] };
+
+  const metodo = filtrado && !programaSel() ? ' Periodos anteriores: promedio simple de los programas; último periodo: ponderado por matriculados.' : '';
+  $('#sub-evolucion').textContent = etq + ' · ' + vis[0] + ' a ' + vis[vis.length-1] + (estado.f.semestre !== 'Todos' ? ' (solo semestres ' + estado.f.semestre + ')' : '') + '.' + metodo;
+
+  const ley = $('#ley-evolucion'); ley.replaceChildren(
+    el('span',null, el('i',{class:'key-linea', style:'border-color:' + C.azul}), 'TAI'),
+    el('span',null, el('i',{class:'key-linea punteada', style:'border-color:' + C.rojo}), 'TDA'));
+  if (filtrado) ley.append(el('span',null, el('i',{class:'key-linea', style:'border-color:#9AA6BA'}), 'Institucional'));
+
+  grafico('g-evolucion').setOption({
+    animationDurationUpdate: 500,
+    textStyle:{ fontFamily:'IBM Plex Sans' },
+    grid:{ left: 48, right: 58, top: 22, bottom: 34 },
+    xAxis:{ type:'category', data: vis, boundaryGap:false, axisLabel:{ color:C.tenue, fontSize:11, hideOverlap:true }, axisLine:{ lineStyle:{ color:C.borde } }, axisTick:{ show:false } },
+    yAxis:{ type:'value', min:0, axisLabel:{ formatter: pctEje, color:C.tenue, fontSize:11.5 }, splitLine:{ lineStyle:{ color:C.rejilla } } },
+    tooltip:{ trigger:'axis', confine:true, axisPointer:{ type:'line', lineStyle:{ color:C.ref, width:1 } }, backgroundColor:'#fff', borderColor:C.borde, textStyle:{ color:C.tinta, fontSize:12.5 },
+      formatter: (ps) => `<div style="font-weight:600;margin-bottom:4px">${esc(ps[0].axisValue)}</div>` + ps.map(p => {
+        const v = p.value && typeof p.value === 'object' ? p.value.value : p.value;
+        const dash = /TDA/.test(p.seriesName) ? 'dashed' : 'solid';
+        return `<div><span style="display:inline-block;width:14px;border-top:2px ${dash} ${p.color};margin-right:6px;vertical-align:middle"></span><b>${pct(v)}</b> <span style="color:${C.tenue}">${esc(p.seriesName)}</span></div>`;
+      }).join('') },
+    series
+  }, { replaceMerge:['series'] });
+}
+
+/* ---------- Variación ---------- */
+function renderVariacion(){
+  const d = estado.datos, i = iPeriodo(), ia = iAnterior(), sel = programaSel();
+  const nodo = document.getElementById('g-variacion');
+  if (ia < 0){
+    $('#sub-variacion').textContent = 'No hay un periodo anterior para comparar.';
+    nodo.style.height = '120px'; grafico('g-variacion').clear(); return;
+  }
+  const lista = grupo().map(o => ({
+    o, dT: o.tai && o.tai[i] != null && o.tai[ia] != null ? o.tai[i] - o.tai[ia] : null,
+       dD: o.tda && o.tda[i] != null && o.tda[ia] != null ? o.tda[i] - o.tda[ia] : null
+  })).filter(r => r.dT != null || r.dD != null)
+    .sort((a,b) => ((b.dT||0)+(b.dD||0)) - ((a.dT||0)+(a.dD||0)));
+  $('#sub-variacion').textContent = `Puntos porcentuales (pp) de ${d.periodos[ia]} a ${d.periodos[i]}. A la derecha, la tasa subió; a la izquierda, bajó. Ordenados de mayor a menor aumento.`;
+  if (!lista.length){
+    $('#sub-variacion').textContent = `No hay datos de ${d.periodos[ia]} y ${d.periodos[i]} para comparar en este grupo.`;
+    nodo.style.height = '40px'; grafico('g-variacion').clear(); return;
+  }
+  const alto = Math.max(160, lista.length * 30 + 60);
+  nodo.style.height = alto + 'px';
+  const g = grafico('g-variacion'); g.resize();
+  const vals = lista.flatMap(r => [r.dT, r.dD]).filter(v => v != null);
+  const ext = Math.ceil(Math.max(0.01, ...vals.map(Math.abs)) * 1.05 / 0.05) * 0.05;
+  const etiquetaBarra = { show: lista.length <= 6, position:'right', formatter:(p) => pp(p.value), color:C['tinta-2'], fontSize:11 };
+  g.setOption({
+    animationDurationUpdate: 500,
+    textStyle:{ fontFamily:'IBM Plex Sans' },
+    grid:{ left: 8, right: 22, top: 6, bottom: 28, containLabel:true },
+    xAxis:{ type:'value', min:-ext, max:ext, interval: ext / 2, axisLabel:{ formatter:(v) => (v>0?'+':'') + nf0.format(v*100), color:C.tenue, fontSize:11 }, splitLine:{ lineStyle:{ color:C.rejilla } }, name:'pp', nameLocation:'end', nameGap:6, nameTextStyle:{ color:C.tenue, fontSize:11 } },
+    yAxis:{ type:'category', inverse:true, data: lista.map(r => r.o.corto), axisLabel:{ color:C['tinta-2'], fontSize:11.5, width: window.innerWidth < 640 ? 130 : 210, overflow:'truncate' }, axisTick:{ show:false }, axisLine:{ show:false } },
+    tooltip:{ trigger:'axis', axisPointer:{ type:'shadow', shadowStyle:{ color:'rgba(10,43,94,0.05)' } }, confine:true, backgroundColor:'#fff', borderColor:C.borde, textStyle:{ color:C.tinta, fontSize:12.5 },
+      formatter:(ps) => { const r = lista[ps[0].dataIndex]; const o = r.o;
+        return `<div style="font-weight:600;margin-bottom:4px;max-width:260px;white-space:normal">${esc(o.nombre)}</div>` +
+          `<div><b>${pp(r.dT)}</b> TAI <span style="color:${C.tenue}">(${pct(o.tai && o.tai[ia])} → ${pct(o.tai && o.tai[i])})</span></div>` +
+          `<div><b>${pp(r.dD)}</b> TDA <span style="color:${C.tenue}">(${pct(o.tda && o.tda[ia])} → ${pct(o.tda && o.tda[i])})</span></div>`; } },
+    series:[
+      { name:'TAI', type:'bar', data: lista.map(r => r.dT == null ? '-' : r.dT), itemStyle:{ color:C.azul, borderRadius:3 }, barMaxWidth:10, barGap:'25%', label: etiquetaBarra,
+        markLine:{ silent:true, symbol:'none', animation:false, lineStyle:{ color:C.tinta, width:1, type:'solid', opacity:.5 }, label:{ show:false }, data:[ { xAxis:0 } ] } },
+      { name:'TDA', type:'bar', data: lista.map(r => r.dD == null ? '-' : r.dD), itemStyle:{ color:C.rojo, borderRadius:3, decal: null }, barMaxWidth:10, label: etiquetaBarra }
+    ]
+  }, { replaceMerge:['series'] });
+}
+
+/* ---------- Mapa de calor ---------- */
+const RAMPAS = {
+  tai: ['#E9F0F9','#C4D6EE','#93B4DF','#5F8DCB','#2F64AC','#163F7A'],
+  tda: ['#FBEAEC','#F3C4C9','#E7939B','#D95F6B','#BC2F3E','#821521']
+};
+const CORTES = [0, 0.03, 0.06, 0.09, 0.12, 0.15];
+function renderCalor(){
+  const d = estado.datos, t = estado.calor, vis = periodosVisibles(), idxs = vis.map(x => d.periodos.indexOf(x));
+  document.querySelectorAll('#toggle-calor button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === t)));
+  const filas = grupo().filter(o => o[t] && o[t].some(v => v != null));
+  const datos = [];
+  filas.forEach((o, y) => idxs.forEach((j, x) => { const v = o[t][j]; datos.push([x, y, v == null ? '-' : v]); }));
+  const nodo = document.getElementById('g-calor');
+  const movil = window.innerWidth < 640;
+  nodo.style.height = Math.max(150, filas.length * 24 + 92) + 'px';
+  const g = grafico('g-calor'); g.resize();
+  const rampa = RAMPAS[t];
+  const pieces = CORTES.map((c, k) => ({ gte: c, lt: CORTES[k+1], color: rampa[k],
+    label: k === CORTES.length-1 ? '≥ ' + nf0.format(c*100) + ' %' : nf0.format(c*100) + '–' + nf0.format(CORTES[k+1]*100) + ' %' }));
+  g.setOption({
+    animation:false,
+    textStyle:{ fontFamily:'IBM Plex Sans' },
+    grid:{ left: movil ? 130 : 230, right: 10, top: 44, bottom: 30 },
+    xAxis:{ type:'category', data: vis, splitArea:{ show:false }, axisLabel:{ color:C.tenue, fontSize:11, interval: movil ? 'auto' : 0, rotate: vis.length > 14 ? 45 : 0, formatter:(v) => v === estado.f.periodo ? '{s|' + v + '}' : v, rich:{ s:{ fontWeight:700, color:C.tinta, fontSize:11 } } }, axisTick:{ show:false }, axisLine:{ show:false } },
+    yAxis:{ type:'category', inverse:true, data: filas.map(o => o.corto), axisLabel:{ color:C['tinta-2'], fontSize:11.5, width: movil ? 120 : 220, overflow:'truncate' }, axisTick:{ show:false }, axisLine:{ show:false } },
+    visualMap:{ type:'piecewise', dimension:2, pieces, orient:'horizontal', top:0, left: movil ? 0 : 'right', itemWidth:14, itemHeight:12, itemGap:8, textStyle:{ color:C['tinta-2'], fontSize:11.5 }, text:null, selectedMode:false },
+    tooltip:{ trigger:'item', confine:true, backgroundColor:'#fff', borderColor:C.borde, textStyle:{ color:C.tinta, fontSize:12.5 },
+      formatter:(p) => { const o = filas[p.value[1]]; const v = p.value[2];
+        return `<div style="font-weight:600;max-width:260px;white-space:normal">${esc(o.nombre)}</div><div><b>${v === '-' ? 'Sin dato' : pct(v)}</b> <span style="color:${C.tenue}">${t.toUpperCase()} · ${esc(vis[p.value[0]])}</span></div>`; } },
+    series:[{ type:'heatmap', data: datos, itemStyle:{ borderColor:'#fff', borderWidth:2, borderRadius:3 }, emphasis:{ itemStyle:{ borderColor:C.tinta, borderWidth:1.5 } } }]
+  }, { notMerge:true });
+}
+
+/* ---------- Tabla ---------- */
+const COLUMNAS = [
+  { id:'programa', t:'Programa' },
+  { id:'grado', t:'Grado' },
+  { id:'tai', t:'TAI', num:true },
+  { id:'dtai', t:'Δ TAI', num:true },
+  { id:'tda', t:'TDA', num:true },
+  { id:'dtda', t:'Δ TDA', num:true },
+  { id:'cuad', t:'Cuadrante' },
+  { id:'mat', t:'Matriculados', num:true }
+];
+function filasTabla(){
+  const d = estado.datos, i = iPeriodo(), ia = iAnterior();
+  const rx = d.inst.tai ? d.inst.tai[i] : null, ry = d.inst.tda ? d.inst.tda[i] : null;
+  const esUlt = d.periodos[i] === d.ultimo;
+  return grupo().map(o => {
+    const tai = o.tai ? o.tai[i] : null, tda = o.tda ? o.tda[i] : null;
+    return { o, programa:o.nombre, facultad:o.facultad, grado:o.grado, tai, tda,
+      dtai: tai != null && ia >= 0 && o.tai[ia] != null ? tai - o.tai[ia] : null,
+      dtda: tda != null && ia >= 0 && o.tda[ia] != null ? tda - o.tda[ia] : null,
+      cuad: cuadrante(tai, tda, rx, ry),
+      mat: esUlt && o.rTai ? o.rTai.matriculados : null };
+  }).filter(r => r.tai != null || r.tda != null);
+}
+function renderTabla(){
+  const d = estado.datos, i = iPeriodo(), ia = iAnterior();
+  const tr = $('#thead-fila'); tr.replaceChildren();
+  COLUMNAS.forEach(c => {
+    const ord = estado.orden.col === c.id;
+    const th = el('th', { class: c.num ? 'num' : '', scope:'col' });
+    if (ord) th.setAttribute('aria-sort', estado.orden.dir > 0 ? 'ascending' : 'descending');
+    let txt = c.t; if (c.id === 'tai' || c.id === 'tda') txt += ' ' + estado.f.periodo;
+    if (c.id === 'mat') txt += ' ' + (d.periodos[i] === d.ultimo ? '(TAI)' : '');
+    th.append(el('button',{ type:'button', onclick:() => { estado.orden = { col:c.id, dir: ord ? -estado.orden.dir : (c.num ? -1 : 1) }; renderTabla(); } },
+      txt, el('span',{ class:'flecha', text: ord ? (estado.orden.dir > 0 ? '▲' : '▼') : '↕' })));
+    tr.append(th);
+  });
+  const q = clave(estado.busqueda);
+  let filas = filasTabla().filter(r => !q || clave(r.programa).includes(q));
+  const { col, dir } = estado.orden;
+  const ordenQ = { alerta:0, silenciosa:1, retorno:2, estable:3 };
+  filas.sort((a,b) => {
+    let va = a[col], vb = b[col];
+    if (col === 'cuad'){ va = va ? ordenQ[va] : 9; vb = vb ? ordenQ[vb] : 9; }
+    if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+    return (typeof va === 'string' ? va.localeCompare(vb,'es') : va - vb) * dir;
+  });
+  const tb = $('#tbody'); tb.replaceChildren();
+  const celdaNum = (v, f, cls) => el('td',{ class:'num' + (cls ? ' ' + cls : ''), text: v == null ? '—' : f(v) });
+  // fila del grupo
+  const gT = tasaGrupo('tai', i), gD = tasaGrupo('tda', i), gTa = tasaGrupo('tai', ia), gDa = tasaGrupo('tda', ia);
+  if (!programaSel()){
+    tb.append(el('tr',{ class:'fila-inst' },
+      el('td',{ text: hayFiltroGrupo() ? 'Grupo filtrado' : 'Institucional' }), el('td',{ text:'' }),
+      celdaNum(gT.v, pct), celdaNum(gT.v != null && gTa.v != null ? gT.v - gTa.v : null, v => flecha(v) + ' ' + pp(v)),
+      celdaNum(gD.v, pct), celdaNum(gD.v != null && gDa.v != null ? gD.v - gDa.v : null, v => flecha(v) + ' ' + pp(v)),
+      el('td',{ text:'Referencia' }),
+      celdaNum(!hayFiltroGrupo() && d.periodos[i] === d.ultimo && d.totTai ? d.totTai.matriculados : (gT.metodo === 'ponderado' ? gT.den : null), ent)));
+  }
+  filas.forEach(r => {
+    const q = r.cuad ? CUADS[r.cuad] : null;
+    tb.append(el('tr', null,
+      el('td', null, el('div',{ class:'prog', text: r.programa }), el('div',{ class:'fac', text: r.facultad })),
+      el('td',{ text: r.grado }),
+      celdaNum(r.tai, pct), celdaNum(r.dtai, v => flecha(v) + ' ' + pp(v)),
+      celdaNum(r.tda, pct, r.tda == null ? 'vacio' : ''), celdaNum(r.dtda, v => flecha(v) + ' ' + pp(v)),
+      el('td', null, q ? el('span',{ class:'chip', text: q.icono + ' ' + q.nombre }) : el('span',{ class:'chip vacio', text:'Sin TDA' })),
+      celdaNum(r.mat, ent)));
+  });
+  $('#sub-tabla').textContent = `${filas.length} programas · periodo ${d.periodos[i]}` + (ia >= 0 ? ` · variación frente a ${d.periodos[ia]}` : '') + '. Toca un encabezado para ordenar.';
+}
+function descargarCSV(){
+  const d = estado.datos, filas = filasTabla();
+  const enc = ['Programa','Facultad','Grado','TAI ' + estado.f.periodo,'Variacion TAI (pp)','TDA ' + estado.f.periodo,'Variacion TDA (pp)','Cuadrante','Matriculados'];
+  const n4 = v => v == null ? '' : (v*100).toFixed(2).replace('.', ',');
+  const lineas = [enc].concat(filas.map(r => [r.programa, r.facultad, r.grado, n4(r.tai), n4(r.dtai), n4(r.tda), n4(r.dtda), r.cuad ? CUADS[r.cuad].nombre : 'Sin TDA', r.mat == null ? '' : r.mat]));
+  const csv = '﻿' + lineas.map(l => l.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(';')).join('\r\n');
+  const a = el('a',{ href: URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' })), download: 'tasas_TAI_TDA_' + estado.f.periodo + '.csv' });
+  document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+function renderPie(){
+  const d = estado.datos, f = d.fuentes || {};
+  const fecha = s => s ? new Date(s).toLocaleString('es-CO',{ dateStyle:'medium', timeStyle:'short' }) : '—';
+  const p = $('#pie-fuentes'); p.replaceChildren();
+  p.append(el('b',{ text:'Fuente: ' }),
+    (f.tai ? f.tai.nombre + ' (modificado ' + fecha(f.tai.modificado) + ')' : 'TAI') + ' y ' +
+    (f.tda ? f.tda.nombre + ' (modificado ' + fecha(f.tda.modificado) + ')' : 'TDA') +
+    '. Datos generados ' + fecha(d.generado) + '.');
+}
+
+/* =========================================================
+   Carga de datos, actualización automática
+   ========================================================= */
+function urlApi(fresco){
+  const q = new URLSearchParams();
+  if (fresco) q.set('fresh','1');
+  if (API_TOKEN) q.set('token', API_TOKEN);
+  q.set('_', Date.now());
+  return API_URL + '?' + q.toString();
+}
+function jsonp(url){
+  return new Promise((ok, mal) => {
+    const nombre = 'cbTasas' + Date.now();
+    const s = document.createElement('script');
+    const limpiar = () => { delete window[nombre]; s.remove(); };
+    const t = setTimeout(() => { limpiar(); mal(new Error('Tiempo de espera agotado')); }, TIEMPO_ESPERA_MS);
+    window[nombre] = (data) => { clearTimeout(t); limpiar(); ok(data); };
+    s.onerror = () => { clearTimeout(t); limpiar(); mal(new Error('No se pudo cargar la API')); };
+    s.src = url + '&callback=' + nombre;
+    document.head.append(s);
+  });
+}
+async function pedirFetch(url){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), TIEMPO_ESPERA_MS);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal, cache:'no-store', redirect:'follow' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+async function pedir(fresco){
+  const url = urlApi(fresco);
+  try { return await pedirFetch(url); }
+  catch (e) {
+    if (e.name === 'AbortError') throw new Error('La API tardó demasiado en responder');
+    await new Promise(r => setTimeout(r, 2500));          // un reintento: Google a veces falla en frío
+  }
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), TIEMPO_ESPERA_MS);
+    const r = await fetch(url, { signal: ctrl.signal, cache:'no-store', redirect:'follow' });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('La API tardó demasiado en responder');
+    return await jsonp(url);   // respaldo si el navegador bloquea fetch
+  }
+}
+function valido(p){ return p && p.ok && p.tai && p.tda && p.tai.historico && p.tda.historico; }
+function ponerEstado(tipo, texto){
+  const e = $('#estado'); e.className = 'estado' + (tipo === 'vivo' ? '' : ' ' + tipo);
+  $('#estado-texto').textContent = texto;
+}
+function aplicar(payload, origen){
+  const primera = !estado.datos;
+  estado.datos = construirModelo(payload);
+  estado.origen = origen;
+  if (primera){
+    leerHash();
+    if (!estado.f.periodo || !estado.datos.periodos.includes(estado.f.periodo)) estado.f.periodo = estado.datos.ultimo;
+  } else if (!estado.datos.periodos.includes(estado.f.periodo)) estado.f.periodo = estado.datos.ultimo;
+  render();
+}
+let cargando = false;
+async function cargar(fresco){
+  if (cargando) return;
+  cargando = true;
+  const btn = $('#btn-actualizar'); btn.classList.add('girando'); btn.disabled = true;
+  if (estado.datos) $('#principal').classList.add('cargando');
+  ponerEstado(estado.datos ? (estado.origen || 'vivo') : 'respaldo', 'Consultando datos…');
+  try {
+    const p = await pedir(fresco);
+    if (!valido(p)) throw new Error((p && p.error) || 'Respuesta inesperada de la API');
+    almacen.guardar('tasasFUTCO.ultimo', JSON.stringify(p));
+    aplicar(p, 'vivo');
+    $('#aviso').classList.remove('visible');
+    ponerEstado('vivo', 'En línea · ' + new Date().toLocaleTimeString('es-CO',{ hour:'2-digit', minute:'2-digit' }));
+  } catch (e) {
+    let origen = 'copia guardada en este navegador';
+    if (!estado.datos){
+      let p = null; try { p = JSON.parse(almacen.leer('tasasFUTCO.ultimo') || 'null'); } catch(_){}
+      if (!valido(p)) { p = RESPALDO; origen = 'copia de respaldo incluida en la página'; }
+      aplicar(p, 'respaldo');
+    } else origen = 'últimos datos cargados';
+    const av = $('#aviso'); av.textContent = 'No se pudo conectar con Google Sheets (' + e.message + '). Se muestran los ' + origen.replace(/^copia/, 'datos de la copia') + '.';
+    av.classList.add('visible');
+    ponerEstado('error', 'Sin conexión');
+  } finally {
+    cargando = false;
+    btn.classList.remove('girando'); btn.disabled = false;
+    $('#principal').classList.remove('cargando');
+    reprogramar();
+  }
+}
+let reloj = null, proxima = 0;
+function reprogramar(){
+  clearInterval(reloj);
+  const min = +$('#auto').value;
+  if (!min){ $('#cuenta').textContent = ''; return; }
+  proxima = Date.now() + min * 60000;
+  const tic = () => {
+    if (document.hidden) return;
+    const resta = proxima - Date.now();
+    if (resta <= 0){ clearInterval(reloj); cargar(false); return; }
+    const s = Math.ceil(resta/1000);
+    $('#cuenta').textContent = 'Próxima en ' + Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  };
+  tic(); reloj = setInterval(tic, 1000);
+}
+
+/* =========================================================
+   Eventos
+   ========================================================= */
+let animacion = null;
+function detenerPlay(){
+  clearInterval(animacion); animacion = null;
+  $('#btn-play').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>';
+  $('#btn-play').setAttribute('aria-label','Recorrer los periodos');
+}
+function iniciarPlay(){
+  const vis = periodosVisibles();
+  let k = 0; estado.f.periodo = vis[0]; render();
+  $('#btn-play').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+  $('#btn-play').setAttribute('aria-label','Detener recorrido');
+  animacion = setInterval(() => {
+    k++; if (k >= vis.length){ detenerPlay(); return; }
+    estado.f.periodo = vis[k]; render();
+  }, 1100);
+}
+function enlazar(){
+  $('#f-periodo').addEventListener('change', e => { detenerPlay(); cambiar('periodo', e.target.value); });
+  $('#f-facultad').addEventListener('change', e => cambiar('facultad', e.target.value));
+  $('#f-grado').addEventListener('change', e => cambiar('grado', e.target.value));
+  $('#f-programa').addEventListener('change', e => cambiar('programa', e.target.value));
+  document.querySelectorAll('#f-semestre button').forEach(b => b.addEventListener('click', () => { detenerPlay(); cambiar('semestre', b.dataset.v); }));
+  document.querySelectorAll('#toggle-calor button').forEach(b => b.addEventListener('click', () => { estado.calor = b.dataset.v; guardarHash(); renderCalor(); }));
+  $('#btn-limpiar').addEventListener('click', () => { detenerPlay(); Object.assign(estado.f, { periodo: estado.datos.ultimo, semestre:'Todos', facultad:'Todas', grado:'Todos', programa:'Todos' }); estado.busqueda=''; $('#buscar').value=''; render(); });
+  $('#btn-play').addEventListener('click', () => animacion ? detenerPlay() : iniciarPlay());
+  $('#btn-actualizar').addEventListener('click', () => cargar(true));
+  $('#auto').addEventListener('change', e => { almacen.guardar('tasasFUTCO.auto', e.target.value); reprogramar(); });
+  $('#buscar').addEventListener('input', e => { estado.busqueda = e.target.value; renderTabla(); });
+  $('#btn-csv').addEventListener('click', descargarCSV);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && +$('#auto').value && Date.now() >= proxima) cargar(false); });
+  let tr = null;
+  window.addEventListener('resize', () => { clearTimeout(tr); tr = setTimeout(() => { Object.values(graficos).forEach(g => g.resize()); renderVariacion(); renderCalor(); }, 150); });
+  graficoClick();
+}
+function graficoClick(){
+  grafico('g-riesgo').on('click', p => { if (p.data && p.data.k){ estado.f.programa = estado.f.programa === p.data.k ? 'Todos' : p.data.k; render(); } });
+  grafico('g-calor').on('click', p => {
+    const vis = periodosVisibles(); if (p.value && vis[p.value[0]]) { estado.f.periodo = vis[p.value[0]]; render(); }
+  });
+}
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+(function iniciar(){
+  if (typeof echarts === 'undefined'){
+    $('#aviso').textContent = 'No se pudo cargar la librería de gráficos (ECharts). Revisa tu conexión a Internet y recarga la página.';
+    $('#aviso').classList.add('visible'); return;
+  }
+  const auto = almacen.leer('tasasFUTCO.auto'); if (auto != null) $('#auto').value = auto;
+  leerColores();
+  enlazar();
+  cargar(false);
+})();
+</script>
+</body>
+</html>
